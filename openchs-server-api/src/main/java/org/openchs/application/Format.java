@@ -1,5 +1,7 @@
 package org.openchs.application;
 
+import org.openchs.web.request.FormatContract;
+
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.validation.constraints.NotNull;
@@ -12,9 +14,6 @@ public class Format {
 
     @Column(name = "valid_format_description_key", nullable = false)
     private String descriptionKey;
-
-    public Format(){
-    }
 
     public Format(String regex, String descriptionKey){
         this.regex = regex;
