@@ -56,8 +56,7 @@ public class AddressLevel extends OrganisationAwareEntity {
         return parentAddressLevels.stream().findFirst().orElse(null);
     }
 
-    //@Deprecated
-    public void setParentAddressLevel(AddressLevel parentAddressLevel) {
+    public void addParentAddressLevel(AddressLevel parentAddressLevel) {
         parentAddressLevels.add(parentAddressLevel);
     }
 
