@@ -19,9 +19,9 @@ public class AddressLevel extends OrganisationAwareEntity {
     @Column(name = "type", nullable = true)
     private String type;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent_id")
-    private AddressLevel parentAddressLevel;
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "location_location_mapping", joinColumns = {@JoinColumn(name = "location_id")}, inverseJoinColumns = {@JoinColumn(name = "parent_location_id")})
+    private Set<AddressLevel> parentAddressLevels = new HashSet<>();
 
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "catchment_address_mapping", joinColumns = {@JoinColumn(name = "addresslevel_id")}, inverseJoinColumns = {@JoinColumn(name = "catchment_id")})
@@ -43,12 +43,22 @@ public class AddressLevel extends OrganisationAwareEntity {
         this.level = level;
     }
 
-    public AddressLevel getParentAddressLevel() {
-        return parentAddressLevel;
+    public Set<AddressLevel> getParentAddressLevels() {
+        return parentAddressLevels;
     }
 
+    public void setParentAddressLevels(Set<AddressLevel> addressLevels) {
+        parentAddressLevels = addressLevels;
+    }
+
+    //@Deprecated
+    public AddressLevel getParentAddressLevel() {
+        return parentAddressLevels.stream().findFirst().orElse(null);
+    }
+
+    //@Deprecated
     public void setParentAddressLevel(AddressLevel parentAddressLevel) {
-        this.parentAddressLevel = parentAddressLevel;
+        parentAddressLevels.add(parentAddressLevel);
     }
 
     public Set<Catchment> getCatchments() {
