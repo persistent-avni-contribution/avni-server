@@ -18,7 +18,7 @@ import java.util.List;
 @Repository
 @RepositoryRestResource(collectionResourceRel = "addressLevel", path = "addressLevel")
 @PreAuthorize(value = "hasAnyAuthority('user', 'admin')")
-public interface AddressLevelRepository extends PagingAndSortingRepository<AddressLevel, Long>, CHSRepository<AddressLevel> {
+public interface LocationRepository extends PagingAndSortingRepository<AddressLevel, Long>, CHSRepository<AddressLevel> {
     @RestResource(path = "byCatchmentAndLastModified", rel = "byCatchmentAndLastModified")
     Page<AddressLevel> findByCatchmentsIdAndAuditLastModifiedDateTimeIsBetweenOrderByAuditLastModifiedDateTimeAscIdAsc(
             @Param("catchmentId") long catchmentId,
