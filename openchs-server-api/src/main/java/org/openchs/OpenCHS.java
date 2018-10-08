@@ -36,19 +36,6 @@ public class OpenCHS {
         app.run(args);
     }
 
-    @Bean
-    public ResourceProcessor<Resource<Individual>> individualProcessor() {
-        return new ResourceProcessor<Resource<Individual>>() {
-            @Override
-            public Resource<Individual> process(Resource<Individual> resource) {
-                Individual individual = resource.getContent();
-                resource.removeLinks();
-                resource.add(new Link(individual.getAddressLevel().getUuid(), "addressUUID"));
-                resource.add(new Link(individual.getGender().getUuid(), "genderUUID"));
-                return resource;
-            }
-        };
-    }
 
     @Bean
     public ResourceProcessor<Resource<ProgramEncounter>> programEncounterProcessor() {
@@ -59,20 +46,6 @@ public class OpenCHS {
                 resource.removeLinks();
                 resource.add(new Link(programEncounter.getEncounterType().getUuid(), "encounterTypeUUID"));
                 resource.add(new Link(programEncounter.getProgramEnrolment().getUuid(), "programEnrolmentUUID"));
-                return resource;
-            }
-        };
-    }
-
-    @Bean
-    public ResourceProcessor<Resource<Encounter>> encounterProcessor() {
-        return new ResourceProcessor<Resource<Encounter>>() {
-            @Override
-            public Resource<Encounter> process(Resource<Encounter> resource) {
-                Encounter encounter = resource.getContent();
-                resource.removeLinks();
-                resource.add(new Link(encounter.getEncounterType().getUuid(), "encounterTypeUUID"));
-                resource.add(new Link(encounter.getIndividual().getUuid(), "individualUUID"));
                 return resource;
             }
         };
