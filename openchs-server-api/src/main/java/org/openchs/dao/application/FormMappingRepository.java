@@ -12,6 +12,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 @Repository
 @RepositoryRestResource(collectionResourceRel = "formMapping", path = "formMapping")
@@ -32,4 +33,6 @@ public interface FormMappingRepository extends PagingAndSortingRepository<FormMa
     List<FormMapping> findAllByEntityIdIsNullAndObservationsTypeEntityIdIsNull();
 
     FormMapping findByEntityIdAndObservationsTypeEntityIdAndFormFormType(Long entityId, Long observationsTypeEntityId, FormType formType);
+
+    List<FormMapping> findAllByEntityIdAndObservationsTypeEntityIdAndFormFormType(Long entityId, Long encounterTypeId, FormType formType);
 }
