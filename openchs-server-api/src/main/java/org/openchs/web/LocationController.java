@@ -9,16 +9,18 @@ import org.openchs.domain.AddressLevel;
 import org.openchs.domain.AddressLevelType;
 import org.openchs.domain.Organisation;
 import org.openchs.framework.security.UserContextHolder;
+import org.openchs.web.request.Lineage;
 import org.openchs.web.request.LocationContract;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.rest.webmvc.RepositoryRestController;
+import org.springframework.hateoas.PagedResources;
+import org.springframework.hateoas.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
 import javax.validation.constraints.NotNull;
@@ -27,8 +29,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-@RestController
-public class LocationController {
+//@BasePathAwareController
+@RepositoryRestController
+public class LocationController implements RestControllerResourceProcessor<AddressLevel> {
 
     private final AddressLevelTypeRepository addressLevelTypeRepository;
     private OrganisationRepository organisationRepository;
@@ -62,6 +65,62 @@ public class LocationController {
         }
         return ResponseEntity.ok(null);
     }
+
+    @GetMapping(value = "locations")
+    @ResponseBody
+    public PagedResources<Resource<AddressLevel>> getAll(Pageable pageable) {
+        return wrap(locationRepository.findAll(pageable));
+    }
+
+    @GetMapping(value = "locations/search/findByParentLocation")
+    @ResponseBody
+    public PagedResources<Resource<AddressLevel>> findByParent(
+            @RequestParam(value = "q", required = false) String title,
+            @RequestParam(value = "parentLocationId", required = false) Long parentLocationId,
+            Pageable pageable) {
+        if (title == null && parentLocationId != null)
+            return wrap(locationRepository.findByParentLocationMappingsParentLocationIdIs(parentLocationId, pageable));
+        if (title != null && parentLocationId != null) {
+            return wrap(locationRepository.findByTitleIgnoreCaseContainingAndParentLocationMappingsParentLocationIdIs(title, parentLocationId, pageable));
+        }
+        Double topLevel = locationRepository.getTopLevel();
+        if (title != null && parentLocationId == null) {
+            return wrap(locationRepository.findByTitleIgnoreCaseContainingAndLevel(title, topLevel, pageable));
+        }
+        if (title == null && parentLocationId == null) {
+            return wrap(locationRepository.findByLevel(topLevel, pageable));
+        }
+        return null;
+    }
+
+    @GetMapping(value = "locations/search/find")
+    @ResponseBody
+    public PagedResources<Resource<AddressLevel>> find(
+            @RequestParam(value = "lineage", required = false) String _lineage,
+            @RequestParam(value = "id", required = false) Long id,
+            @RequestParam(value = "q", required = false) String title,
+            @RequestParam(value = "parentLocationId", required = false) Long parentLocationId,
+            Pageable pageable) {
+        Lineage lineage = Lineage.parse(_lineage);
+        Double defaultedLevel = locationRepository.getTopLevel();
+        if(id !=null) {
+            return wrap(locationRepository.findById(id, pageable));
+        }
+        if (title != null && parentLocationId == null) {
+            return wrap(locationRepository.findByTitleIgnoreCaseContainingAndLevel(title, defaultedLevel, pageable));
+        }
+        if (title != null && parentLocationId != null) {
+            return wrap(locationRepository.findByTitleIgnoreCaseContainingAndParentLocationMappingsParentLocationIdIs(title, parentLocationId, pageable));
+        }
+        if (title == null && parentLocationId != null) {
+            return wrap(locationRepository.findByParentLocationMappingsParentLocationIdIs(parentLocationId, pageable));
+        }
+        if (title == null && parentLocationId == null) {
+            return wrap(locationRepository.findByLevel(defaultedLevel, pageable));
+        }
+        return null;
+    }
+
 
     private AddressLevelType saveType(String type) {
         if (type == null) return null;

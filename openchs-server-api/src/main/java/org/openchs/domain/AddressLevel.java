@@ -1,18 +1,20 @@
 package org.openchs.domain;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.Immutable;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "address_level")
 @BatchSize(size = 100)
+@JsonIgnoreProperties({"type"})
 public class AddressLevel extends OrganisationAwareEntity {
     @Column
     @NotNull
@@ -117,5 +119,23 @@ public class AddressLevel extends OrganisationAwareEntity {
 
     public ParentLocationMapping findLocationMappingByParentLocationUUID(String uuid) {
         return parentLocationMappings.stream().filter(parentLocationMapping -> parentLocationMapping.getParentLocation().getUuid().equals(uuid)).findFirst().orElse(null);
+    }
+
+    @JsonIgnore
+    public AddressLevel getParentLocation() {
+        return parentLocationMappings.stream().map(ParentLocationMapping::getParentLocation).findAny().orElse(null);
+    }
+
+    @JsonAnyGetter
+    public Map<String, Map<String, Object>> any() {
+        Map<String,Map<String,Object>> customProps = new HashMap<String,Map<String,Object>>(){{
+            put("lineage", new HashMap<>());
+        }};
+        AddressLevel lineage = this;
+        while(null != (lineage)) {
+            customProps.get("lineage").put(lineage.getTypeString()+"Id", lineage.getId());
+            lineage = lineage.getParentLocation();
+        }
+        return customProps;
     }
 }

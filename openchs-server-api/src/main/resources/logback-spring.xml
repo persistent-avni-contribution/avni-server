@@ -2,10 +2,10 @@
 <configuration>
     <include resource="org/springframework/boot/logging/logback/base.xml"/>
     <springProfile name="dev">
-        <logger name="org.openchs" additivity="true" level="info">
+        <logger name="org.openchs" additivity="true" level="debug">
             <appender-ref ref="FILE"/>
         </logger>
-        <logger name="org.springframework" level="OFF"/>
+        <logger name="org.springframework" level="debug"/>
         <logger name="org.hibernate.search.batchindexing.impl.SimpleIndexingProgressMonitor" level="OFF"/>
     </springProfile>
     <springProfile name="live">
