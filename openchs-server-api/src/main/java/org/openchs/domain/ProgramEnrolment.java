@@ -1,10 +1,12 @@
 package org.openchs.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.Type;
 import org.joda.time.DateTime;
 import org.openchs.geo.Point;
+import org.springframework.data.rest.core.config.Projection;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -141,5 +143,18 @@ public class ProgramEnrolment extends OrganisationAwareEntity {
 
     public void setExitLocation(Point exitLocation) {
         this.exitLocation = exitLocation;
+    }
+
+    @JsonIgnore
+    public String getOperationalProgramName() {
+        return program.getOperationalProgramName();
+    }
+
+    @Projection(name="MinimalProgramEnrolmentProjection", types=ProgramEnrolment.class)
+    public interface MinimalProgramEnrolmentProjection {
+        String getUuid();
+        String getOperationalProgramName();
+        String getEnrolmentDateTime();
+        String getProgramExitDateTime();
     }
 }
