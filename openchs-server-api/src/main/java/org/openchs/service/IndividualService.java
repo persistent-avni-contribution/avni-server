@@ -40,6 +40,7 @@ public class IndividualService {
         Set<EncounterContract> encountersContractList = constructEncounters(individual.getEncounters());
         IndividualContract individualContract = new IndividualContract();
         individualContract.setEncounters(encountersContractList);
+        individualContract.setSubjectType(SubjectTypeContract.fromSubjectType(individual.getSubjectType()));
         return individualContract;
     }
 
@@ -53,6 +54,7 @@ public class IndividualService {
         individualContract.setUuid(individual.getUuid());
         individualContract.setEnrolments(enrolmentContractList);
         individualContract.setVoided(individual.isVoided());
+        individualContract.setSubjectType(SubjectTypeContract.fromSubjectType(individual.getSubjectType()));
         return individualContract;
     }
 
@@ -73,11 +75,12 @@ public class IndividualService {
         individualContract.setFirstName(individual.getFirstName());
         individualContract.setLastName(individual.getLastName());
         individualContract.setDateOfBirth(individual.getDateOfBirth());
-        individualContract.setGender(individual.getGender().getName());
+        individualContract.setGender(individual.getGender() != null ? individual.getGender().getName(): null);
         individualContract.setAddressLevel(individual.getAddressLevel().getTitle());
         individualContract.setRegistrationDate(individual.getRegistrationDate());
         individualContract.setFullAddress(individual.getAddressLevel().getTitleLineage());
         individualContract.setVoided(individual.isVoided());
+        individualContract.setSubjectType(SubjectTypeContract.fromSubjectType(individual.getSubjectType()));
         return individualContract;
     }
 

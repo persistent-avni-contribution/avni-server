@@ -1,6 +1,5 @@
 package org.openchs.web.request;
 
-import org.openchs.domain.Encounter;
 import org.openchs.web.request.common.CommonIndividualRequest;
 
 import java.util.*;
@@ -16,6 +15,8 @@ public class IndividualContract extends CommonIndividualRequest {
     private List<EnrolmentContract> enrolments = new ArrayList<>();
 
     private Set<EncounterContract> encounters = new HashSet<>();
+
+    private SubjectTypeContract subjectType = new SubjectTypeContract();
 
     public String getFullAddress() {
         return fullAddress;
@@ -55,5 +56,14 @@ public class IndividualContract extends CommonIndividualRequest {
 
     public void setEncounters(Set<EncounterContract> encounters) {
         this.encounters = encounters;
+    }
+
+
+    public void setSubjectType(SubjectTypeContract subjectType) {
+        this.subjectType = subjectType;
+    }
+
+    public SubjectTypeContract getSubjectType() {
+        return subjectType;
     }
 }
