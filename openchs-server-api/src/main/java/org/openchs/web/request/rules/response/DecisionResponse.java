@@ -1,6 +1,5 @@
 package org.openchs.web.request.rules.response;
 
-import java.util.ArrayList;
 import java.util.List;
 public class DecisionResponse implements Decisions
 {

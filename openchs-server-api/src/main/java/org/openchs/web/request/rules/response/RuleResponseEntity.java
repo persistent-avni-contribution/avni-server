@@ -8,9 +8,18 @@ public class RuleResponseEntity{
     private String status;
     private DecisionResponseEntity data;
     private List<ObservationContract> observation;
+    private List<ValidationResponse> formValidate;
     private String message;
+    private boolean visibility;
 
-    public List<ObservationContract> getObservation() {
+    public boolean isVisibility() {
+        return visibility;
+    }
+
+    public void setVisibility(boolean visibility) {
+        this.visibility = visibility;
+    }
+ public List<ObservationContract> getObservation() {
         return observation;
     }
 
@@ -31,6 +40,14 @@ public class RuleResponseEntity{
 
     public void setData(DecisionResponseEntity data) {
         this.data = data;
+    }
+
+    public List<ValidationResponse> getFormValidate() {
+        return formValidate;
+    }
+
+    public void setFormValidate(List<ValidationResponse> formValidate) {
+        this.formValidate = formValidate;
     }
 
     public String getMessage() {

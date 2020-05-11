@@ -56,6 +56,7 @@ public class DecisionRuleValidation {
         return decisionValidation;
     }
 
+
     private <T> ArrayList<T> validateDecisionValue(ArrayList<T> decisionValue,RuleFailureLog ruleFailureLog) {
         ArrayList<T> validateDecisionList = new ArrayList<>();
         decisionValue.stream().

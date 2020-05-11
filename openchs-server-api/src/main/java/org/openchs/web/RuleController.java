@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -65,7 +66,7 @@ public class RuleController {
     @RequestMapping(value = "/web/decisionrule", method = RequestMethod.POST)
     ResponseEntity<?> decisionRules(@RequestBody RequestEntityWrapper requestEntityWrapper) throws IOException, JSONException {
         RuleResponseEntity ruleResponseEntity = null;
-        if(requestEntityWrapper.getRule().getWorkFlowType() != null) {
+        if (requestEntityWrapper.getRule().getWorkFlowType() != null) {
             switch (requestEntityWrapper.getRule().getWorkFlowType().toLowerCase()) {
                 case "individual":
                     ruleResponseEntity = ruleService.decisionRuleIndividualWorkFlow(requestEntityWrapper);
@@ -81,9 +82,53 @@ public class RuleController {
                     break;
             }
         }
-        if(ruleResponseEntity.getStatus().equalsIgnoreCase("success")) {
+        if (ruleResponseEntity.getStatus().equalsIgnoreCase("success")) {
             return ResponseEntity.ok().body(ruleResponseEntity);
-        }else{
+        } else {
+            return ResponseEntity.badRequest().body(ruleResponseEntity);
+        }
+    }
+
+    @RequestMapping(value = "/web/validationrule", method = RequestMethod.POST)
+    ResponseEntity<?> validationRules(@RequestBody RequestEntityWrapper requestEntityWrapper) throws IOException, JSONException {
+        RuleResponseEntity ruleResponseEntity = null;
+        if (requestEntityWrapper.getRule().getWorkFlowType() != null) {
+            switch (requestEntityWrapper.getRule().getWorkFlowType().toLowerCase()) {
+                case "individual":
+                   ruleResponseEntity = ruleService.validationRuleIndividualWorkFlow(requestEntityWrapper);
+                    break;
+                case "programencounter":
+                    ruleResponseEntity = ruleService.decisionRuleProgramEncounterWorkFlow(requestEntityWrapper);
+                    break;
+                case "programenrolment":
+                    ruleResponseEntity = ruleService.decisionRuleProgramEnrolmentWorkFlow(requestEntityWrapper);
+                    break;
+            }
+        }
+        if (ruleResponseEntity.getStatus().equalsIgnoreCase("success")) {
+            return ResponseEntity.ok().body(ruleResponseEntity);
+        } else {
+            return ResponseEntity.badRequest().body(ruleResponseEntity);
+        }
+    }
+
+    @RequestMapping(value = "/web/programenrolmentcheckrule", method = RequestMethod.POST)
+    ResponseEntity<?> programEnrolmentCheckRules(@RequestBody RequestEntityWrapper requestEntityWrapper) throws IOException, JSONException {
+        RuleResponseEntity ruleResponseEntity = null;
+        if (requestEntityWrapper.getRule().getWorkFlowType() != null) {
+            switch (requestEntityWrapper.getRule().getWorkFlowType().toLowerCase()) {
+                case "programencounter":
+                    ruleResponseEntity = ruleService.decisionRuleProgramEncounterWorkFlow(requestEntityWrapper);
+                    break;
+                case "programenrolmentcheck":
+                    ruleResponseEntity = ruleService.decisionRuleProgramEnrolmentCheckWorkFlow(requestEntityWrapper);
+                    break;
+            }
+        }
+
+        if (ruleResponseEntity.getStatus().equalsIgnoreCase("success")) {
+            return ResponseEntity.ok().body(ruleResponseEntity);
+        } else {
             return ResponseEntity.badRequest().body(ruleResponseEntity);
         }
     }

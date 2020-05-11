@@ -31,6 +31,7 @@ import org.springframework.util.StringUtils;
 
 import javax.transaction.Transactional;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -181,6 +182,12 @@ public class RuleService {
         return ruleResponseEntity;
     }
 
+    public RuleResponseEntity validationRuleIndividualWorkFlow(RequestEntityWrapper requestEntityWrapper){
+        IndividualContractWrapper individualContractWrapper = individualConstructionService.constructIndividualContract(requestEntityWrapper.getIndividualRequestEntity());
+        individualContractWrapper.setRule(requestEntityWrapper.getRule());
+        return createHttpHeaderAndSendRequest("/api/individual_validation_rule",individualContractWrapper,null);
+    }
+
     public RuleResponseEntity decisionRuleIndividualWorkFlow(RequestEntityWrapper requestEntityWrapper) throws IOException, JSONException {
         IndividualContractWrapper individualContractWrapper = individualConstructionService.constructIndividualContract(requestEntityWrapper.getIndividualRequestEntity());
         individualContractWrapper.setRule(requestEntityWrapper.getRule());
@@ -190,6 +197,13 @@ public class RuleService {
         ruleResponseEntity.setObservation(observationConstructionService.responseObservation(ruleResponseEntity.getData().getRegistrationDecisions()));
 
         return ruleResponseEntity;
+    }
+
+    public RuleResponseEntity decisionRuleProgramEnrolmentCheckWorkFlow(RequestEntityWrapper requestEntityWrapper){
+        ProgramEnrolmentContractWrapper programEnrolmentContractWrapper = programEnrolmentConstructionService.constructProgramEnrolmentContract(requestEntityWrapper.getProgramEnrolmentRequestEntity());
+        programEnrolmentContractWrapper.setRule(requestEntityWrapper.getRule());
+        RuleFailureLog ruleFailureLog = decisionRuleValidation.generateRuleFailureLog(requestEntityWrapper,"Web","Program Enrolment",requestEntityWrapper.getProgramEnrolmentRequestEntity().getUuid());
+        return createHttpHeaderAndSendRequest("/api/program_enrolment_check_rule",programEnrolmentContractWrapper,ruleFailureLog);
     }
 
     private RuleResponseEntity createHttpHeaderAndSendRequest(String url, Object contractObject,RuleFailureLog ruleFailureLog){
