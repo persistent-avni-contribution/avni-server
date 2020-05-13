@@ -12,8 +12,19 @@ public class RuleResponseEntity{
     private DecisionResponseEntity data;
     private List<VisitSchedule> visitSchedules;
     private List<ObservationContract> observation;
+    private List<ValidationResponse> formValidate;
     private List<ProgramEncountersContract> programEncounters;
     private String message;
+    private Boolean visibility;
+
+    public Boolean getVisibility() {
+        return visibility;
+    }
+
+    public void setVisibility(Boolean visibility) {
+        this.visibility = visibility;
+    }
+
 
     public List<ProgramEncountersContract> getProgramEncounters() {
         return programEncounters;
@@ -52,6 +63,14 @@ public class RuleResponseEntity{
 
     public void setData(DecisionResponseEntity data) {
         this.data = data;
+    }
+
+    public List<ValidationResponse> getFormValidate() {
+        return formValidate;
+    }
+
+    public void setFormValidate(List<ValidationResponse> formValidate) {
+        this.formValidate = formValidate;
     }
 
     public String getMessage() {
