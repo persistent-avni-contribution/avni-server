@@ -10,16 +10,17 @@ public class RuleResponseEntity{
     private List<ObservationContract> observation;
     private List<ValidationResponse> formValidate;
     private String message;
-    private boolean visibility;
+    private Boolean visibility;
 
-    public boolean isVisibility() {
+    public Boolean getVisibility() {
         return visibility;
     }
 
-    public void setVisibility(boolean visibility) {
+    public void setVisibility(Boolean visibility) {
         this.visibility = visibility;
     }
- public List<ObservationContract> getObservation() {
+
+    public List<ObservationContract> getObservation() {
         return observation;
     }
 

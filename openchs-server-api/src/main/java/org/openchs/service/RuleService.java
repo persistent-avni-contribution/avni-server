@@ -199,7 +199,7 @@ public class RuleService {
         return ruleResponseEntity;
     }
 
-    public RuleResponseEntity decisionRuleProgramEnrolmentCheckWorkFlow(RequestEntityWrapper requestEntityWrapper){
+    public RuleResponseEntity programEnrolmentCheckRuleWorkFlow(RequestEntityWrapper requestEntityWrapper){
         ProgramEnrolmentContractWrapper programEnrolmentContractWrapper = programEnrolmentConstructionService.constructProgramEnrolmentContract(requestEntityWrapper.getProgramEnrolmentRequestEntity());
         programEnrolmentContractWrapper.setRule(requestEntityWrapper.getRule());
         RuleFailureLog ruleFailureLog = decisionRuleValidation.generateRuleFailureLog(requestEntityWrapper,"Web","Program Enrolment",requestEntityWrapper.getProgramEnrolmentRequestEntity().getUuid());
