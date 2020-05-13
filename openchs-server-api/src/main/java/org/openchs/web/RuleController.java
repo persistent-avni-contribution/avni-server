@@ -87,4 +87,24 @@ public class RuleController {
             return ResponseEntity.badRequest().body(ruleResponseEntity);
         }
     }
+
+    @RequestMapping(value = "/web/visitrule", method = RequestMethod.POST)
+    ResponseEntity<?> visitScheduleRules(@RequestBody RequestEntityWrapper requestEntityWrapper) throws IOException, JSONException {
+        RuleResponseEntity ruleResponseEntity = null;
+        if(requestEntityWrapper.getRule().getWorkFlowType() != null) {
+            switch (requestEntityWrapper.getRule().getWorkFlowType().toLowerCase()) {
+                case "programenrolment":
+                    ruleResponseEntity = ruleService.visitScheduleRuleProgramEnrolmentWorkFlow(requestEntityWrapper);
+                    break;
+                case "encounter":
+                    ruleResponseEntity = ruleService.visitScheduleRuleEncounterWorkFlow(requestEntityWrapper);
+                    break;
+            }
+        }
+        if(ruleResponseEntity.getStatus().equalsIgnoreCase("success")) {
+            return ResponseEntity.ok().body(ruleResponseEntity);
+        }else{
+            return ResponseEntity.badRequest().body(ruleResponseEntity);
+        }
+    }
 }
