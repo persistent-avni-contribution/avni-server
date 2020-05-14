@@ -116,6 +116,15 @@ public class RuleController {
                 case "individual":
                    ruleResponseEntity = ruleService.validationRuleIndividualWorkFlow(requestEntityWrapper);
                     break;
+                case "programenrolment":
+                    ruleResponseEntity = ruleService.validationRuleProgramEnrolmentWorkFlow(requestEntityWrapper);
+                    break;
+                case "programencounter":
+                    ruleResponseEntity = ruleService.validationRuleProgramEncounterWorkFlow(requestEntityWrapper);
+                    break;
+                case "encounter":
+                    ruleResponseEntity = ruleService.validationRuleEncounterWorkFlow(requestEntityWrapper);
+                    break;
             }
         }
         if (ruleResponseEntity.getStatus().equalsIgnoreCase("success")) {
@@ -125,13 +134,16 @@ public class RuleController {
         }
     }
 
-    @RequestMapping(value = "/web/programenrolmentcheckrule", method = RequestMethod.POST)
+    @RequestMapping(value = "/web/eligibiltycheckrule", method = RequestMethod.POST)
     ResponseEntity<?> programEnrolmentCheckRules(@RequestBody RequestEntityWrapper requestEntityWrapper) throws IOException, JSONException {
         RuleResponseEntity ruleResponseEntity = null;
         if (requestEntityWrapper.getRule().getWorkFlowType() != null) {
             switch (requestEntityWrapper.getRule().getWorkFlowType().toLowerCase()) {
                 case "programenrolment":
                     ruleResponseEntity = ruleService.programEnrolmentCheckRuleWorkFlow(requestEntityWrapper);
+                    break;
+                case "encounter":
+                    ruleResponseEntity = ruleService.encounterCheckRuleWorkFlow(requestEntityWrapper);
                     break;
             }
         }
@@ -142,4 +154,5 @@ public class RuleController {
             return ResponseEntity.badRequest().body(ruleResponseEntity);
         }
     }
+
 }

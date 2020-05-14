@@ -202,13 +202,6 @@ public class RuleService {
         return ruleResponseEntity;
     }
 
-    public RuleResponseEntity validationRuleIndividualWorkFlow(RequestEntityWrapper requestEntityWrapper){
-        String ruleType = requestEntityWrapper.getRule().getRuleType().toLowerCase();
-        IndividualContractWrapper individualContractWrapper = individualConstructionService.constructIndividualContract(requestEntityWrapper.getIndividualRequestEntity());
-        individualContractWrapper.setRule(requestEntityWrapper.getRule());
-        return createHttpHeaderAndSendRequest("/api/"+ruleType+"_"+ RuleEnum.INDIVIDUAL_RULE.getRuleName(),individualContractWrapper);
-    }
-
     public RuleResponseEntity decisionRuleIndividualWorkFlow(RequestEntityWrapper requestEntityWrapper) throws IOException, JSONException {
         String ruleType = requestEntityWrapper.getRule().getRuleType().toLowerCase();
         IndividualContractWrapper individualContractWrapper = individualConstructionService.constructIndividualContract(requestEntityWrapper.getIndividualRequestEntity());
@@ -217,7 +210,6 @@ public class RuleService {
         RuleResponseEntity ruleResponseEntity = createHttpHeaderAndSendRequest("/api/"+ruleType+"_"+ RuleEnum.INDIVIDUAL_RULE.getRuleName(),individualContractWrapper);
         ruleResponseEntity.getData().setRegistrationDecisions(decisionRuleValidation.validateDecision(ruleResponseEntity.getData().getRegistrationDecisions(),ruleFailureLog));
         ruleResponseEntity.setObservation(observationConstructionService.responseObservation(ruleResponseEntity.getData().getRegistrationDecisions()));
-
         return ruleResponseEntity;
     }
 
@@ -225,8 +217,48 @@ public class RuleService {
         String ruleType = requestEntityWrapper.getRule().getRuleType().toLowerCase();
         ProgramEnrolmentContractWrapper programEnrolmentContractWrapper = programEnrolmentConstructionService.constructProgramEnrolmentContract(requestEntityWrapper.getProgramEnrolmentRequestEntity());
         programEnrolmentContractWrapper.setRule(requestEntityWrapper.getRule());
-        RuleFailureLog ruleFailureLog = decisionRuleValidation.generateRuleFailureLog(requestEntityWrapper,"Web","Program Enrolment",requestEntityWrapper.getProgramEnrolmentRequestEntity().getUuid());
-        return createHttpHeaderAndSendRequest("/api/"+ruleType+"_"+ RuleEnum.PROGRAM_ENROLMENT_RULE.getRuleName() ,programEnrolmentContractWrapper);
+        RuleResponseEntity ruleResponseEntity = createHttpHeaderAndSendRequest("/api/"+ruleType+"_"+ RuleEnum.PROGRAM_ENROLMENT_RULE.getRuleName() ,programEnrolmentContractWrapper);
+        return ruleResponseEntity;
+    }
+
+    public RuleResponseEntity encounterCheckRuleWorkFlow(RequestEntityWrapper requestEntityWrapper){
+        String ruleType = requestEntityWrapper.getRule().getRuleType().toLowerCase();
+        EncounterContractWrapper encounterContractWrapper = programEncounterConstructionService.constructEncounterContract(requestEntityWrapper.getEncounterRequestEntity());
+        encounterContractWrapper.setRule(requestEntityWrapper.getRule());
+        RuleResponseEntity ruleResponseEntity = createHttpHeaderAndSendRequest("/api/"+ruleType+"_"+ RuleEnum.ENCOUNTER_RULE.getRuleName(),encounterContractWrapper);
+        return ruleResponseEntity;
+    }
+
+    public RuleResponseEntity validationRuleIndividualWorkFlow(RequestEntityWrapper requestEntityWrapper){
+        String ruleType = requestEntityWrapper.getRule().getRuleType().toLowerCase();
+        IndividualContractWrapper individualContractWrapper = individualConstructionService.constructIndividualContract(requestEntityWrapper.getIndividualRequestEntity());
+        individualContractWrapper.setRule(requestEntityWrapper.getRule());
+        RuleResponseEntity ruleResponseEntity = createHttpHeaderAndSendRequest("/api/"+ruleType+"_"+ RuleEnum.INDIVIDUAL_RULE.getRuleName(),individualContractWrapper);
+        return ruleResponseEntity;
+    }
+
+    public RuleResponseEntity validationRuleProgramEnrolmentWorkFlow(RequestEntityWrapper requestEntityWrapper){
+        String ruleType = requestEntityWrapper.getRule().getRuleType().toLowerCase();
+        ProgramEnrolmentContractWrapper programEnrolmentContractWrapper = programEnrolmentConstructionService.constructProgramEnrolmentContract(requestEntityWrapper.getProgramEnrolmentRequestEntity());
+        programEnrolmentContractWrapper.setRule(requestEntityWrapper.getRule());
+        RuleResponseEntity ruleResponseEntity = createHttpHeaderAndSendRequest("/api/"+ruleType+"_"+ RuleEnum.PROGRAM_ENROLMENT_RULE.getRuleName() ,programEnrolmentContractWrapper);
+        return ruleResponseEntity;
+    }
+
+    public RuleResponseEntity validationRuleProgramEncounterWorkFlow(RequestEntityWrapper requestEntityWrapper){
+        String ruleType = requestEntityWrapper.getRule().getRuleType().toLowerCase();
+        ProgramEncounterContractWrapper programEncounterContractWrapper = programEncounterConstructionService.constructProgramEncounterContract(requestEntityWrapper.getProgramEncounterRequestEntity());
+        programEncounterContractWrapper.setRule(requestEntityWrapper.getRule());
+        RuleResponseEntity ruleResponseEntity = createHttpHeaderAndSendRequest("/api/"+ruleType+"_"+ RuleEnum.PROGRAM_ENCOUNTER_RULE.getRuleName(),programEncounterContractWrapper);
+        return ruleResponseEntity;
+    }
+
+    public RuleResponseEntity validationRuleEncounterWorkFlow(RequestEntityWrapper requestEntityWrapper){
+        String ruleType = requestEntityWrapper.getRule().getRuleType().toLowerCase();
+        EncounterContractWrapper encounterContractWrapper = programEncounterConstructionService.constructEncounterContract(requestEntityWrapper.getEncounterRequestEntity());
+        encounterContractWrapper.setRule(requestEntityWrapper.getRule());
+        RuleResponseEntity ruleResponseEntity = createHttpHeaderAndSendRequest("/api/"+ruleType+"_"+ RuleEnum.ENCOUNTER_RULE.getRuleName(),encounterContractWrapper);
+        return ruleResponseEntity;
     }
 
     private RuleResponseEntity createHttpHeaderAndSendRequest(String url, Object contractObject){
