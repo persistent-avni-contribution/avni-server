@@ -118,17 +118,17 @@ public class RuleController {
     ResponseEntity<?> validationRules(@RequestBody RequestEntityWrapper requestEntityWrapper) throws IOException, JSONException {
         RuleResponseEntity ruleResponseEntity = null;
         if (requestEntityWrapper.getRule().getWorkFlowType() != null) {
-            switch (requestEntityWrapper.getRule().getWorkFlowType().toLowerCase()) {
-                case "individual":
+            switch (WorkFlowTypeEnum.findByValue(requestEntityWrapper.getRule().getWorkFlowType().toLowerCase())) {
+                case INDIVIDUAL:
                    ruleResponseEntity = ruleService.validationRuleIndividualWorkFlow(requestEntityWrapper);
                     break;
-                case "programenrolment":
+                case PROGRAM_ENROLMENT:
                     ruleResponseEntity = ruleService.validationRuleProgramEnrolmentWorkFlow(requestEntityWrapper);
                     break;
-                case "programencounter":
+                case PROGRAM_ENCOUNTER:
                     ruleResponseEntity = ruleService.validationRuleProgramEncounterWorkFlow(requestEntityWrapper);
                     break;
-                case "encounter":
+                case ENCOUNTER:
                     ruleResponseEntity = ruleService.validationRuleEncounterWorkFlow(requestEntityWrapper);
                     break;
             }
@@ -144,11 +144,11 @@ public class RuleController {
     ResponseEntity<?> programEnrolmentCheckRules(@RequestBody RequestEntityWrapper requestEntityWrapper) throws IOException, JSONException {
         RuleResponseEntity ruleResponseEntity = null;
         if (requestEntityWrapper.getRule().getWorkFlowType() != null) {
-            switch (requestEntityWrapper.getRule().getWorkFlowType().toLowerCase()) {
-                case "programenrolment":
+            switch (WorkFlowTypeEnum.findByValue(requestEntityWrapper.getRule().getWorkFlowType().toLowerCase())) {
+                case PROGRAM_ENROLMENT:
                     ruleResponseEntity = ruleService.programEnrolmentCheckRuleWorkFlow(requestEntityWrapper);
                     break;
-                case "encounter":
+                case ENCOUNTER:
                     ruleResponseEntity = ruleService.encounterCheckRuleWorkFlow(requestEntityWrapper);
                     break;
             }
