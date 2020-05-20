@@ -44,6 +44,8 @@ configurations {
 
 dependencies {
     compile group: 'org.apache.tomcat', name: 'tomcat-jdbc', version: '8.5.46'
+    compile group: 'io.springfox', name: 'springfox-swagger2', version: '2.7.0'
+    compile group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.7.0'
     compile("org.springframework.boot:spring-boot-starter-web:${springBootVersion}")
     compile "org.springframework.boot:spring-boot-starter-data-jpa:${springBootVersion}"
     testCompile "org.springframework.boot:spring-boot-starter-test:${springBootVersion}"
