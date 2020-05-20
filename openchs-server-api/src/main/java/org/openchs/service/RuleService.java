@@ -174,6 +174,7 @@ public class RuleService {
         String ruleType = requestEntityWrapper.getRule().getRuleType().toLowerCase();
         EncounterContractWrapper encounterContractWrapper = programEncounterConstructionService.constructEncounterContract(requestEntityWrapper.getEncounterRequestEntity());
         encounterContractWrapper.setRule(requestEntityWrapper.getRule());
+        encounterContractWrapper.setVisitSchedules(programEncounterConstructionService.constructVisitScheduleContractFromEncounter(requestEntityWrapper.getEncounterRequestEntity().getIndividualUUID()));
         RuleResponseEntity ruleResponseEntity = createHttpHeaderAndSendRequest("/api/"+ruleType+"_"+ RuleEnum.ENCOUNTER_RULE.getRuleName(),encounterContractWrapper);
         return ruleResponseEntity;
     }

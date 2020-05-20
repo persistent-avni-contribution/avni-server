@@ -10,6 +10,7 @@ public class EncounterContractWrapper extends EncounterContract {
     private List<ObservationContract> observations;
     private RuleRequestEntity rule;
     private IndividualContractWrapper subject;
+    private List<VisitSchedule> visitSchedules;
 
     public List<ObservationContract> getObservations() {
         return observations;
@@ -33,5 +34,13 @@ public class EncounterContractWrapper extends EncounterContract {
 
     public void setSubject(IndividualContractWrapper subject) {
         this.subject = subject;
+    }
+
+    public List<VisitSchedule> getVisitSchedules() {
+        return visitSchedules;
+    }
+
+    public void setVisitSchedules(List<VisitSchedule> visitSchedules) {
+        this.visitSchedules = visitSchedules;
     }
 }

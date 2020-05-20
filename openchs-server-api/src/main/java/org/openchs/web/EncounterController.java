@@ -9,6 +9,7 @@ import org.openchs.domain.Individual;
 import org.openchs.domain.ProgramEncounter;
 import org.openchs.geo.Point;
 import org.openchs.service.ConceptService;
+import org.openchs.service.EncounterService;
 import org.openchs.service.ObservationService;
 import org.openchs.service.UserService;
 import org.openchs.util.S;
@@ -48,9 +49,10 @@ public class EncounterController extends AbstractController<Encounter> implement
     private Bugsnag bugsnag;
     private final ConceptRepository conceptRepository;
     private final ConceptService conceptService;
+    private final EncounterService encounterService;
 
     @Autowired
-    public EncounterController(IndividualRepository individualRepository, EncounterTypeRepository encounterTypeRepository, EncounterRepository encounterRepository, ObservationService observationService, UserService userService, Bugsnag bugsnag, ConceptRepository conceptRepository, ConceptService conceptService) {
+    public EncounterController(IndividualRepository individualRepository, EncounterTypeRepository encounterTypeRepository, EncounterRepository encounterRepository, ObservationService observationService, UserService userService, Bugsnag bugsnag, ConceptRepository conceptRepository, ConceptService conceptService,EncounterService encounterService) {
         this.individualRepository = individualRepository;
         this.encounterTypeRepository = encounterTypeRepository;
         this.encounterRepository = encounterRepository;
@@ -59,6 +61,7 @@ public class EncounterController extends AbstractController<Encounter> implement
         this.bugsnag = bugsnag;
         this.conceptRepository = conceptRepository;
         this.conceptService = conceptService;
+        this.encounterService = encounterService;
     }
 
     @RequestMapping(value = "/api/encounters", method = RequestMethod.GET)
@@ -104,40 +107,10 @@ public class EncounterController extends AbstractController<Encounter> implement
     @Transactional
     @PreAuthorize(value = "hasAnyAuthority('user', 'organisation_admin')")
     public void save(@RequestBody EncounterRequest request) {
-        logger.info("Saving encounter with uuid %s", request.getUuid());
-
-        checkForSchedulingCompleteConstraintViolation(request);
-
-        EncounterType encounterType = encounterTypeRepository.findByUuidOrName(request.getEncounterType(), request.getEncounterTypeUUID());
-        Individual individual = individualRepository.findByUuid(request.getIndividualUUID());
-        if (individual == null) {
-            throw new IllegalArgumentException(String.format("Individual not found with UUID '%s'", request.getIndividualUUID()));
+        if(request.getVisitSchedules() != null && request.getVisitSchedules().size() > 0) {
+            encounterService.saveVisitSchedules(request.getIndividualUUID(),request.getVisitSchedules());
         }
-
-        Encounter encounter = newOrExistingEntity(encounterRepository, request, new Encounter());
-        //Planned visit can not overwrite completed encounter
-        if (encounter.isCompleted() && request.isPlanned())
-            return;
-
-        encounter.setEncounterDateTime(request.getEncounterDateTime());
-        encounter.setIndividual(individual);
-        encounter.setEncounterType(encounterType);
-        encounter.setObservations(observationService.createObservations(request.getObservations()));
-        encounter.setName(request.getName());
-        encounter.setEarliestVisitDateTime(request.getEarliestVisitDateTime());
-        encounter.setMaxVisitDateTime(request.getMaxVisitDateTime());
-        encounter.setCancelDateTime(request.getCancelDateTime());
-        encounter.setCancelObservations(observationService.createObservations(request.getCancelObservations()));
-        encounter.setVoided(request.isVoided());
-        PointRequest encounterLocation = request.getEncounterLocation();
-        if (encounterLocation != null)
-            encounter.setEncounterLocation(new Point(encounterLocation.getX(), encounterLocation.getY()));
-        PointRequest cancelLocation = request.getCancelLocation();
-        if (cancelLocation != null)
-            encounter.setCancelLocation(new Point(cancelLocation.getX(), cancelLocation.getY()));
-
-        encounterRepository.save(encounter);
-        logger.info(String.format("Saved encounter with uuid %s", request.getUuid()));
+        encounterService.saveEncounters(request);
     }
 
     @RequestMapping(value = "/encounter/search/byIndividualsOfCatchmentAndLastModified", method = RequestMethod.GET)

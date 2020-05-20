@@ -81,7 +81,7 @@ public class ProgramEncounterService {
     }
 
     public List<ProgramEncounter> constructVisitSchedules(ProgramEnrolment programEnrolment,String encounterTypeName){
-        return programEnrolment.getProgramEncounters().stream().filter(programEncounter -> programEncounter.getEncounterType().getOperationalEncounterTypeName().equals(encounterTypeName)).collect(Collectors.toList());
+        return programEnrolment.getProgramEncounters().stream().filter(programEncounter -> programEncounter.getEncounterType().getName().equals(encounterTypeName)).collect(Collectors.toList());
     }
 
     public void saveVisitSchedules(String uuid,List<VisitSchedule> visitSchedules){
@@ -97,7 +97,7 @@ public class ProgramEncounterService {
 
     public void processVisitSchedule(String uuid,VisitSchedule visitSchedule) throws Exception {
         ProgramEnrolment programEnrolment = getAllEncountersForEnrolment(uuid);
-        List<ProgramEncounter> allScheduleEncountersByType = constructVisitSchedules(programEnrolment,visitSchedule.getName());
+        List<ProgramEncounter> allScheduleEncountersByType = constructVisitSchedules(programEnrolment,visitSchedule.getEncounterType());
         if(allScheduleEncountersByType.isEmpty() || "createNew".equals(visitSchedule.getVisitCreationStrategy())){
             EncounterType encounterType = encounterTypeRepository.findByName(visitSchedule.getEncounterType());
             if(encounterType == null){

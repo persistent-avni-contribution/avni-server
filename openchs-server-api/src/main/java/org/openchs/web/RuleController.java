@@ -100,11 +100,9 @@ public class RuleController {
                 case PROGRAM_ENCOUNTER:
                     ruleResponseEntity = ruleService.visitScheduleRuleProgramEncounterWorkFlow(requestEntityWrapper);
                     break;
-                /* Encounter VisitSchedule , Not in scope of 2nd Release
-                case "encounter":
+                case ENCOUNTER:
                     ruleResponseEntity = ruleService.visitScheduleRuleEncounterWorkFlow(requestEntityWrapper);
                     break;
-                */
             }
         }
         if(ruleResponseEntity.getStatus().equalsIgnoreCase("success")) {
