@@ -37,6 +37,16 @@ public class IndividualContractWrapper {
 
     private List<EncounterContractWrapper> encounters;
 
+    public List<VisitSchedule> getVisitSchedules() {
+        return visitSchedules;
+    }
+
+    public void setVisitSchedules(List<VisitSchedule> visitSchedules) {
+        this.visitSchedules = visitSchedules;
+    }
+
+    private List<VisitSchedule> visitSchedules;
+
     public List<ProgramEnrolmentContractWrapper> getEnrolments() {
         return enrolments;
     }

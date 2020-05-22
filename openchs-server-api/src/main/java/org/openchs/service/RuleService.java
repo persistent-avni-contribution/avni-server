@@ -179,6 +179,15 @@ public class RuleService {
         return ruleResponseEntity;
     }
 
+    public RuleResponseEntity visitScheduleRuleIndividualWorkFlow(RequestEntityWrapper requestEntityWrapper) {
+        String ruleType = requestEntityWrapper.getRule().getRuleType().toLowerCase();
+        IndividualContractWrapper individualContractWrapper = individualConstructionService.constructIndividualContract(requestEntityWrapper.getIndividualRequestEntity());
+        individualContractWrapper.setRule(requestEntityWrapper.getRule());
+        individualContractWrapper.setVisitSchedules(programEncounterConstructionService.constructVisitScheduleContractFromEncounter(requestEntityWrapper.getIndividualRequestEntity().getUuid()));
+        RuleResponseEntity ruleResponseEntity = createHttpHeaderAndSendRequest("/api/"+ruleType+"_"+ RuleEnum.INDIVIDUAL_RULE.getRuleName(),individualContractWrapper);
+return ruleResponseEntity;
+    }
+
     public RuleResponseEntity decisionRuleProgramEnrolmentWorkFlow(RequestEntityWrapper requestEntityWrapper){
         String ruleType = requestEntityWrapper.getRule().getRuleType().toLowerCase();
         ProgramEnrolmentContractWrapper programEnrolmentContractWrapper = programEnrolmentConstructionService.constructProgramEnrolmentContract(requestEntityWrapper.getProgramEnrolmentRequestEntity());
@@ -240,6 +249,7 @@ public class RuleService {
             return ruleResponseEntity;
         }
     }
+
 
 
 }

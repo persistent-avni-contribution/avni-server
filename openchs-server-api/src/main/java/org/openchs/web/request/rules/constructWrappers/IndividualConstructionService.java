@@ -1,10 +1,12 @@
 package org.openchs.web.request.rules.constructWrappers;
 
 import org.openchs.dao.GenderRepository;
+import org.openchs.dao.IndividualRepository;
 import org.openchs.dao.LocationRepository;
 import org.openchs.dao.SubjectTypeRepository;
 import org.openchs.domain.AddressLevel;
 import org.openchs.domain.Gender;
+import org.openchs.domain.Individual;
 import org.openchs.domain.SubjectType;
 import org.openchs.web.request.GenderContract;
 import org.openchs.web.request.SubjectTypeContract;
@@ -25,18 +27,22 @@ public class IndividualConstructionService {
     private final SubjectTypeRepository subjectTypeRepository;
     private final LocationRepository locationRepository;
     private final ObservationConstructionService observationConstructionService;
+    private final IndividualRepository individualRepository;
+    private final ProgramEnrolmentConstructionService programEnrolmentConstructionService;
 
     @Autowired
     public IndividualConstructionService(
-                       GenderRepository genderRepository,
-                       SubjectTypeRepository subjectTypeRepository,
-                       LocationRepository locationRepository,
-                       ObservationConstructionService observationConstructionService) {
+            GenderRepository genderRepository,
+            SubjectTypeRepository subjectTypeRepository,
+            LocationRepository locationRepository,
+            ObservationConstructionService observationConstructionService, IndividualRepository individualRepository,ProgramEnrolmentConstructionService programEnrolmentConstructionService) {
         logger = LoggerFactory.getLogger(this.getClass());
         this.genderRepository = genderRepository;
         this.subjectTypeRepository = subjectTypeRepository;
         this.locationRepository = locationRepository;
         this.observationConstructionService = observationConstructionService;
+        this.individualRepository=individualRepository;
+        this.programEnrolmentConstructionService=programEnrolmentConstructionService;
     }
 
 
@@ -58,6 +64,8 @@ public class IndividualConstructionService {
         if(individualRequestEntity.getObservations() != null){
             individualContract.setObservations(individualRequestEntity.getObservations().stream().map( x -> observationConstructionService.constructObservation(x)).collect(Collectors.toList()));
         }
+        Individual individual=individualRepository.findByUuid(individualRequestEntity.getUuid());
+        individualContract.setEncounters(programEnrolmentConstructionService.constructEncounters(individual.getEncounters()));
         return individualContract;
     }
 

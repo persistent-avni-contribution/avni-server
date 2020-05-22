@@ -5,6 +5,7 @@ import org.openchs.dao.IndividualRepository;
 import org.openchs.dao.ProgramEnrolmentRepository;
 import org.openchs.domain.*;
 import org.openchs.web.request.*;
+import org.openchs.web.request.rules.RulesContractWrapper.EncounterContractWrapper;
 import org.openchs.web.request.rules.RulesContractWrapper.IndividualContractWrapper;
 import org.openchs.web.request.rules.RulesContractWrapper.LowestAddressLevelContract;
 import org.openchs.web.request.rules.RulesContractWrapper.ProgramEnrolmentContractWrapper;
@@ -59,12 +60,12 @@ public class ProgramEnrolmentConstructionService {
             programEnrolmentContractWrapper.setSubject(getSubjectInfo(individualRepository.findByUuid(programEnrolmentRequestEntity.getIndividualUUID())));
         }
         ProgramEnrolment programEnrolment = programEnrolmentRepository.findByUuid(programEnrolmentRequestEntity.getUuid());
-        Set<ProgramEncountersContract> encountersContractList = constructEncounters(programEnrolment.getProgramEncounters());
+        Set<ProgramEncountersContract> encountersContractList = constructProgramEncounters(programEnrolment.getProgramEncounters());
         programEnrolmentContractWrapper.setProgramEncounters(encountersContractList);
         return programEnrolmentContractWrapper;
     }
 
-    public Set<ProgramEncountersContract> constructEncounters(Set<ProgramEncounter> encounters) {
+    public Set<ProgramEncountersContract> constructProgramEncounters(Set<ProgramEncounter> encounters) {
         return encounters.stream().map(encounter -> {
             ProgramEncountersContract encountersContract = new ProgramEncountersContract();
             EncounterTypeContract encounterTypeContract = new EncounterTypeContract();
@@ -79,6 +80,23 @@ public class ProgramEnrolmentConstructionService {
             return encountersContract;
         }).collect(Collectors.toSet());
     }
+    public List<EncounterContractWrapper> constructEncounters(Set<Encounter> encounters) {
+        return encounters.stream().map(encounter -> {
+            EncounterContractWrapper encountersContract = new EncounterContractWrapper();
+            EncounterTypeContract encounterTypeContract = new EncounterTypeContract();
+            encounterTypeContract.setName(encounter.getEncounterType().getOperationalEncounterTypeName());
+            encountersContract.setUuid(encounter.getUuid());
+            encountersContract.setName(encounter.getName());
+            encountersContract.setEncounterType(encounterTypeContract);
+            encountersContract.setEncounterDateTime(encounter.getEncounterDateTime());
+            encountersContract.setEarliestVisitDateTime(encounter.getEarliestVisitDateTime());
+            encountersContract.setMaxVisitDateTime(encounter.getMaxVisitDateTime());
+            encountersContract.setVoided(encounter.isVoided());
+            return encountersContract;
+        }).collect(Collectors.toList());
+    }
+
+
 
     public IndividualContractWrapper getSubjectInfo(Individual individual) {
         IndividualContractWrapper individualContractWrapper = new IndividualContractWrapper();
