@@ -3,12 +3,22 @@ package org.openchs.web.request;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.joda.time.LocalDate;
 import org.openchs.application.Form;
+import org.openchs.web.request.rules.RulesContractWrapper.VisitSchedule;
 
 import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class IndividualRequest extends org.openchs.web.request.common.CommonIndividualRequest {
     private List<ObservationRequest> observations;
+    private List<VisitSchedule> visitSchedules;
+
+    public List<VisitSchedule> getVisitSchedules() {
+        return visitSchedules;
+    }
+
+    public void setVisitSchedules(List<VisitSchedule> visitSchedules) {
+        this.visitSchedules = visitSchedules;
+    }
 
     public IndividualRequest() {
     }

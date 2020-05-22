@@ -1,16 +1,18 @@
 package org.openchs.service;
 
-import org.openchs.dao.ConceptRepository;
-import org.openchs.dao.IndividualRepository;
+import org.openchs.common.EntityHelper;
+import org.openchs.dao.*;
 import org.openchs.domain.*;
 import org.openchs.domain.individualRelationship.IndividualRelation;
 import org.openchs.domain.individualRelationship.IndividualRelationship;
+import org.openchs.geo.Point;
 import org.openchs.web.request.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.projection.ProjectionFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.validation.constraints.NotNull;
 import java.util.*;
@@ -25,13 +27,31 @@ public class IndividualService {
     private final IndividualRepository individualRepository;
     private final ConceptRepository conceptRepository;
     private final ProjectionFactory projectionFactory;
+    private final ObservationService observationService;
+    private final LocationRepository locationRepository;
+    private final GenderRepository genderRepository;
+    private final SubjectTypeRepository subjectTypeRepository;
+    private final UserService userService;
+
 
     @Autowired
-    public IndividualService(ConceptRepository conceptRepository, IndividualRepository individualRepository, ProjectionFactory projectionFactory) {
+    public IndividualService(ConceptRepository conceptRepository,
+                             IndividualRepository individualRepository,
+                             ProjectionFactory projectionFactory,
+                             ObservationService observationService,
+                             LocationRepository locationRepository,
+                             GenderRepository genderRepository,
+                             SubjectTypeRepository subjectTypeRepository,
+                             UserService userService) {
         this.projectionFactory = projectionFactory;
         logger = LoggerFactory.getLogger(this.getClass());
         this.conceptRepository = conceptRepository;
         this.individualRepository = individualRepository;
+        this.observationService = observationService;
+        this.locationRepository = locationRepository;
+        this.genderRepository = genderRepository;
+        this.subjectTypeRepository = subjectTypeRepository;
+        this.userService = userService;
     }
 
     public  IndividualContract getSubjectEncounters(String individualUuid){
@@ -241,5 +261,46 @@ public class IndividualService {
             }
             return observationContract;
         }).collect(Collectors.toList());
+    }
+
+    public void saveIndividual(IndividualRequest individualRequest){
+        logger.info(String.format("Saving individual with UUID %s", individualRequest.getUuid()));
+
+        Individual individual = createIndividualWithoutObservations(individualRequest);
+        individual.setObservations(observationService.createObservations(individualRequest.getObservations()));
+        individualRepository.save(individual);
+        logger.info(String.format("Saved individual with UUID %s", individualRequest.getUuid()));
+    }
+
+    private Individual createIndividualWithoutObservations( IndividualRequest individualRequest) {
+        AddressLevel addressLevel = getAddressLevel(individualRequest);
+        Objects.requireNonNull(addressLevel, String.format("Individual{uuid='%s',addressLevel='%s'} addressLevel doesn't exist.",
+                individualRequest.getUuid(), individualRequest.getAddressLevel()));
+        Gender gender = individualRequest.getGender() == null ? genderRepository.findByUuid(individualRequest.getGenderUUID()) : genderRepository.findByName(individualRequest.getGender());
+        SubjectType subjectType = individualRequest.getSubjectTypeUUID() == null ? subjectTypeRepository.findByUuid("9f2af1f9-e150-4f8e-aad3-40bb7eb05aa3") : subjectTypeRepository.findByUuid(individualRequest.getSubjectTypeUUID());
+        Individual individual =  EntityHelper.newOrExistingEntity(individualRepository, individualRequest, new Individual());
+        individual.setSubjectType(subjectType);
+        individual.setFirstName(individualRequest.getFirstName());
+        individual.setLastName(individualRequest.getLastName());
+        individual.setDateOfBirth(individualRequest.getDateOfBirth());
+        individual.setAddressLevel(addressLevel);
+        individual.setGender(gender);
+        individual.setRegistrationDate(individualRequest.getRegistrationDate());
+        individual.setVoided(individualRequest.isVoided());
+        individual.setFacility(userService.getUserFacility());
+        PointRequest pointRequest = individualRequest.getRegistrationLocation();
+        if (pointRequest != null)
+            individual.setRegistrationLocation(new Point(pointRequest.getX(), pointRequest.getY()));
+        return individual;
+    }
+
+    private AddressLevel getAddressLevel( IndividualRequest individualRequest) {
+        if (individualRequest.getAddressLevelUUID() != null) {
+            return locationRepository.findByUuid(individualRequest.getAddressLevelUUID());
+        } else if (individualRequest.getCatchmentUUID() != null) {
+            return locationRepository.findByTitleAndCatchmentsUuid(individualRequest.getAddressLevel(), individualRequest.getCatchmentUUID());
+        } else {
+            return locationRepository.findByTitleIgnoreCase(individualRequest.getAddressLevel());
+        }
     }
 }

@@ -1,2 +1,2 @@
---alter table address_level
-  --  drop column level;
+alter table address_level
+    drop column level;

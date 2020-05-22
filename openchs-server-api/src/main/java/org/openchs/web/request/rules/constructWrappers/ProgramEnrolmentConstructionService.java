@@ -69,6 +69,7 @@ public class ProgramEnrolmentConstructionService {
         return encounters.stream().map(encounter -> {
             ProgramEncountersContract encountersContract = new ProgramEncountersContract();
             EncounterTypeContract encounterTypeContract = new EncounterTypeContract();
+            encounterTypeContract.setUuid(encounter.getEncounterType().getUuid());
             encounterTypeContract.setName(encounter.getEncounterType().getOperationalEncounterTypeName());
             encountersContract.setUuid(encounter.getUuid());
             encountersContract.setName(encounter.getName());
@@ -80,10 +81,12 @@ public class ProgramEnrolmentConstructionService {
             return encountersContract;
         }).collect(Collectors.toSet());
     }
+
     public List<EncounterContractWrapper> constructEncounters(Set<Encounter> encounters) {
         return encounters.stream().map(encounter -> {
             EncounterContractWrapper encountersContract = new EncounterContractWrapper();
             EncounterTypeContract encounterTypeContract = new EncounterTypeContract();
+            encounterTypeContract.setUuid(encounter.getEncounterType().getUuid());
             encounterTypeContract.setName(encounter.getEncounterType().getOperationalEncounterTypeName());
             encountersContract.setUuid(encounter.getUuid());
             encountersContract.setName(encounter.getName());
@@ -95,8 +98,6 @@ public class ProgramEnrolmentConstructionService {
             return encountersContract;
         }).collect(Collectors.toList());
     }
-
-
 
     public IndividualContractWrapper getSubjectInfo(Individual individual) {
         IndividualContractWrapper individualContractWrapper = new IndividualContractWrapper();
