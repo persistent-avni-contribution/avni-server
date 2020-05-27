@@ -235,6 +235,15 @@ public class RuleService {
         return ruleResponseEntity;
     }
 
+    public RuleResponseEntity workListRuleIndividualWorkFlow(RequestEntityWrapper requestEntityWrapper) throws IOException, JSONException {
+        String ruleType = requestEntityWrapper.getRule().getRuleType().toLowerCase();
+        IndividualContractWrapper individualContractWrapper = individualConstructionService.constructIndividualContract(requestEntityWrapper.getIndividualRequestEntity());
+        individualContractWrapper.setRule(requestEntityWrapper.getRule());
+        individualContractWrapper.setWorkLists(requestEntityWrapper.getIndividualRequestEntity().getWorkLists());
+        RuleResponseEntity ruleResponseEntity = createHttpHeaderAndSendRequest("/api/"+ruleType+"_"+ RuleEnum.INDIVIDUAL_RULE.getRuleName(),individualContractWrapper);
+        return ruleResponseEntity;
+    }
+
     private RuleResponseEntity createHttpHeaderAndSendRequest(String url, Object contractObject){
         try {
             ObjectMapper mapper = new ObjectMapper();

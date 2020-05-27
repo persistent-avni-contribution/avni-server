@@ -1,6 +1,7 @@
 package org.openchs.web.request.rules.request;
 
 import org.joda.time.LocalDate;
+import org.openchs.web.request.rules.RulesContractWrapper.WorkLists;
 
 import java.util.List;
 
@@ -24,6 +25,16 @@ public class IndividualRequestEntity {
     private String subjectTypeUUID;
 
     private List<ObservationRequestEntity> observations;
+
+    private List<WorkLists> workLists;
+
+    public List<WorkLists> getWorkLists() {
+        return workLists;
+    }
+
+    public void setWorkLists(List<WorkLists> workLists) {
+        this.workLists = workLists;
+    }
 
     public void setUuid(String uuid){
         this.uuid = uuid;

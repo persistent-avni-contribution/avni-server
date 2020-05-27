@@ -37,6 +37,16 @@ public class IndividualContractWrapper {
 
     private List<EncounterContractWrapper> encounters;
 
+    private List<WorkLists> workLists;
+
+    public List<WorkLists> getWorkLists() {
+        return workLists;
+    }
+
+    public void setWorkLists(List<WorkLists> workLists) {
+        this.workLists = workLists;
+    }
+
     public List<ProgramEnrolmentContractWrapper> getEnrolments() {
         return enrolments;
     }

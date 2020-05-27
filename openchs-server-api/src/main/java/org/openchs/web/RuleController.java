@@ -117,4 +117,23 @@ public class RuleController {
             return ResponseEntity.badRequest().body(ruleResponseEntity);
         }
     }
+
+    @RequestMapping(value = "/web/worklistrule", method = RequestMethod.POST)
+    ResponseEntity<?> workListRules(@RequestBody RequestEntityWrapper requestEntityWrapper) throws IOException, JSONException {
+        RuleResponseEntity ruleResponseEntity = null;
+        if(requestEntityWrapper.getRule().getWorkFlowType() != null) {
+            switch (WorkFlowTypeEnum.findByValue(requestEntityWrapper.getRule().getWorkFlowType().toLowerCase())) {
+                case INDIVIDUAL:
+                    ruleResponseEntity = ruleService.workListRuleIndividualWorkFlow(requestEntityWrapper);
+                    break;
+            }
+        }
+        if(ruleResponseEntity.getStatus().equalsIgnoreCase("success")) {
+            return ResponseEntity.ok().body(ruleResponseEntity);
+        }else if(HttpStatus.NOT_FOUND.toString().equals(ruleResponseEntity.getStatus())){
+            return new ResponseEntity<>(ruleResponseEntity, HttpStatus.NOT_FOUND);
+        }else{
+            return ResponseEntity.badRequest().body(ruleResponseEntity);
+        }
+    }
 }
