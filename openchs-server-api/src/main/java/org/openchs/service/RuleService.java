@@ -235,6 +235,14 @@ public class RuleService {
         return ruleResponseEntity;
     }
 
+    public RuleResponseEntity programEnrolmentSummaryWorkFlow(RequestEntityWrapper requestEntityWrapper){
+        String ruleType = requestEntityWrapper.getRule().getRuleType().toLowerCase();
+        ProgramEnrolmentContractWrapper programEnrolmentContractWrapper = programEnrolmentConstructionService.constructProgramEnrolmentContract(requestEntityWrapper.getProgramEnrolmentRequestEntity());
+        programEnrolmentContractWrapper.setRule(requestEntityWrapper.getRule());
+        RuleResponseEntity ruleResponseEntity = createHttpHeaderAndSendRequest("/api/"+ruleType+"_"+ RuleEnum.PROGRAM_ENROLMENT_RULE.getRuleName() ,programEnrolmentContractWrapper);
+        return ruleResponseEntity;
+    }
+
     private RuleResponseEntity createHttpHeaderAndSendRequest(String url, Object contractObject){
         try {
             ObjectMapper mapper = new ObjectMapper();

@@ -15,6 +15,7 @@ public class RuleResponseEntity{
     private List<VisitSchedule> visitSchedules;
     private List<ObservationContract> observation;
     private List<ProgramEncountersContract> programEncounters;
+    private List<SummaryResponse> summaries;
     private String message;
 
     public List<ProgramEncountersContract> getProgramEncounters() {
@@ -23,6 +24,14 @@ public class RuleResponseEntity{
 
     public void setProgramEncounters(List<ProgramEncountersContract> programEncounters) {
         this.programEncounters = programEncounters;
+    }
+
+    public List<SummaryResponse> getSummaries() {
+        return summaries;
+    }
+
+    public void setSummaries(List<SummaryResponse> summaries) {
+        this.summaries = summaries;
     }
 
     public List<VisitSchedule> getVisitSchedules() {

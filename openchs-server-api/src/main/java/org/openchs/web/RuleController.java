@@ -117,4 +117,22 @@ public class RuleController {
             return ResponseEntity.badRequest().body(ruleResponseEntity);
         }
     }
+
+    @RequestMapping(value = "/web/summaryrule", method = RequestMethod.POST)
+    ResponseEntity<?> programEnrolmentSummary(@RequestBody RequestEntityWrapper requestEntityWrapper) throws IOException, JSONException {
+        RuleResponseEntity ruleResponseEntity = null;
+        if (requestEntityWrapper.getRule().getWorkFlowType() != null) {
+            switch (WorkFlowTypeEnum.findByValue(requestEntityWrapper.getRule().getWorkFlowType().toLowerCase())) {
+                case PROGRAM_ENROLMENT:
+                    ruleResponseEntity = ruleService.programEnrolmentSummaryWorkFlow(requestEntityWrapper);
+                    break;
+            }
+        }
+
+        if (ruleResponseEntity.getStatus().equalsIgnoreCase("success")) {
+            return ResponseEntity.ok().body(ruleResponseEntity);
+        } else {
+            return ResponseEntity.badRequest().body(ruleResponseEntity);
+        }
+    }
 }
