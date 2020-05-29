@@ -117,4 +117,21 @@ public class RuleController {
             return ResponseEntity.badRequest().body(ruleResponseEntity);
         }
     }
+
+    @RequestMapping(value = "/web/checklistrule", method = RequestMethod.POST)
+    ResponseEntity<?> checkListRule(@RequestBody RequestEntityWrapper requestEntityWrapper) throws IOException, JSONException {
+        RuleResponseEntity ruleResponseEntity = null;
+        if(requestEntityWrapper.getRule().getWorkFlowType() != null) {
+            switch (WorkFlowTypeEnum.findByValue(requestEntityWrapper.getRule().getWorkFlowType().toLowerCase())) {
+                case PROGRAM_ENROLMENT:
+                    ruleResponseEntity = ruleService.checkListRuleProgramEnrolmentWorkFlow(requestEntityWrapper);
+                    break;
+            }
+        }
+        if(ruleResponseEntity.getStatus().equalsIgnoreCase("success")) {
+            return ResponseEntity.ok().body(ruleResponseEntity);
+        }else{
+            return ResponseEntity.badRequest().body(ruleResponseEntity);
+        }
+    }
 }
