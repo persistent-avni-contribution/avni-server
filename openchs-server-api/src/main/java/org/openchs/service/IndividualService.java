@@ -78,7 +78,9 @@ public class IndividualService {
         List<ObservationContract> observationContractsList = observationService.constructObservations(individual.getObservations());
         List<RelationshipContract> relationshipContractList = constructRelationships(individual);
         List<EnrolmentContract> enrolmentContractList = constructEnrolments(individual);
-        individualContract.setId(individual.getId());
+        if(null!=individual.getId()) {
+            individualContract.setId(individual.getId());
+        }
         individualContract.setSubjectType(constructSubjectType(individual.getSubjectType()));
         individualContract.setObservations(observationContractsList);
         individualContract.setRelationships(relationshipContractList);

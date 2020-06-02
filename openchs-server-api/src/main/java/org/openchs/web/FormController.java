@@ -248,8 +248,8 @@ public class FormController implements RestControllerResourceProcessor<BasicForm
     }
 
     @RequestMapping(value = "/forms/export", method = RequestMethod.GET)
-    @PreAuthorize(value = "hasAnyAuthority('admin', 'organisation_admin')")
-    public FormContract export(@RequestParam String formUUID) {
+    //@PreAuthorize(value = "hasAnyAuthority('admin', 'organisation_admin')")
+    public FormContract export(@RequestParam(value = "formUUID",required = false) String formUUID) {
         Form form = formRepository.findByUuid(formUUID);
 
         FormContract formContract = new FormContract(formUUID, form.getAudit().getLastModifiedBy().getUuid(), form.getName(), form.getFormType().toString());

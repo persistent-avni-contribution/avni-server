@@ -85,14 +85,17 @@ public class ProgramEnrolmentService {
             encounterTypeIdList = Arrays.asList(encounterTypeUuids.split(","));
         }
         ProgramEnrolment programEnrolment = programEnrolmentRepository.findByUuid(uuid);
-        programEncountersContract = programEncounterRepository.findAll(
-                where(programEncounterRepository.withProgramEncounterId(programEnrolment.getId()))
-                        .and(programEncounterRepository.withProgramEncounterTypeIdUuids(encounterTypeIdList))
-                        .and(programEncounterRepository.withProgramEncounterEarliestVisitDateTime(earliestVisitDateTime))
-                        .and(programEncounterRepository.withProgramEncounterDateTime(encounterDateTime))
-                        .and(programEncounterRepository.withNotNullEncounterDateTime())
-                ,pageable).map(programEncounter -> programEncounterService.constructProgramEncounters(programEncounter));
-        return programEncountersContract;
+        if(null!=programEnrolment) {
+            programEncountersContract = programEncounterRepository.findAll(
+                    where(programEncounterRepository.withProgramEncounterId(programEnrolment.getId()))
+                            .and(programEncounterRepository.withProgramEncounterTypeIdUuids(encounterTypeIdList))
+                            .and(programEncounterRepository.withProgramEncounterEarliestVisitDateTime(earliestVisitDateTime))
+                            .and(programEncounterRepository.withProgramEncounterDateTime(encounterDateTime))
+                            .and(programEncounterRepository.withNotNullEncounterDateTime())
+                    , pageable).map(programEncounter -> programEncounterService.constructProgramEncounters(programEncounter));
+        }
+            return programEncountersContract;
+
     }
 
     public void programEnrolmentSave(ProgramEnrolmentRequest request){

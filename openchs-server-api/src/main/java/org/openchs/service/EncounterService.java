@@ -58,7 +58,9 @@ public class EncounterService {
     public EncounterContract constructEncounters(Encounter encounter) {
             EncounterContract encountersContract = new EncounterContract();
             EncounterTypeContract encounterTypeContract = new EncounterTypeContract();
-            encounterTypeContract.setName(encounter.getEncounterType().getName());
+            if(null!=encounter.getEncounterType().getName()) {
+                encounterTypeContract.setName(encounter.getEncounterType().getName());
+            }
             encounterTypeContract.setUuid(encounter.getEncounterType().getUuid());
             encounterTypeContract.setEncounterEligibilityCheckRule(encounter.getEncounterType().getEncounterEligibilityCheckRule());
             encountersContract.setUuid(encounter.getUuid());
