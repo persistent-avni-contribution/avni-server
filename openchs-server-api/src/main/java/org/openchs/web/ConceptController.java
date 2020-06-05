@@ -90,7 +90,7 @@ public class ConceptController implements RestControllerResourceProcessor<Concep
     public ConceptUsageContract getConceptUsage(@PathVariable String uuid) {
         ConceptUsageContract conceptUsageContract = new ConceptUsageContract();
         Concept concept = conceptRepository.findByUuid(uuid);
-        if (ConceptDataType.NA.toString().equals(concept.getDataType())) {
+        if (null!=concept && ConceptDataType.NA.toString().equals(concept.getDataType())) {
             conceptService.addDependentConcepts(conceptUsageContract, concept);
         } else {
             conceptService.addDependentFormDetails(conceptUsageContract, concept);
