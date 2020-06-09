@@ -11,6 +11,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.criteria.*;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.openchs.domain.OperatingIndividualScope.ByCatchment;
@@ -107,9 +109,20 @@ public interface IndividualRepository extends TransactionalDataRepository<Indivi
         return (Root<Individual> root, CriteriaQuery<?> query, CriteriaBuilder cb) ->
                 value == null ? cb.and() : cb.or(
                         jsonContains(root.get("observations"), "%" + value + "%", cb),
-                        jsonContains(root.join("programEnrolments", JoinType.LEFT).get("observations"), "%" + value + "%", cb));
-    }
+                        jsonContains(root.join("programEnrolments", JoinType.LEFT).get("observations"), "%" + value + "%", cb),
+                        jsonContains(root.join("encounters", JoinType.LEFT).get("observations"), "%" + value + "%", cb));
 
+    }
+    default Specification<Individual> getFilterSpecForIndividualType(String value) {
+
+        return (Root<Individual> root, CriteriaQuery<?> query, CriteriaBuilder cb) ->
+                value == null ? cb.and() : root.get("subjectType").get("uuid").in(value);
+    }
+    default Specification<Individual> getFilterSpecForGender(String value) {
+
+        return (Root<Individual> root, CriteriaQuery<?> query, CriteriaBuilder cb) ->
+                value == null ? cb.and() : root.get("gender").get("uuid").in(value);
+    }
     default Specification<Individual> getFilterSpecForLocationIds(List<Long> locationIds) {
         return (Root<Individual> root, CriteriaQuery<?> query, CriteriaBuilder cb) ->
                 locationIds == null ? cb.and() : root.get("addressLevel").get("id").in(locationIds);
@@ -120,7 +133,15 @@ public interface IndividualRepository extends TransactionalDataRepository<Indivi
                 locationName == null ? cb.and() :
                         cb.like(cb.upper(root.get("addressLevel").get("titleLineage")), "%" + locationName.toUpperCase() + "%");
     }
+    default Specification<Individual> getFilterSpecForAgeRange(String locationName) {
+        return (Root<Individual> root, CriteriaQuery<?> query, CriteriaBuilder cb) ->
+                locationName == null ? cb.and() :
+                        cb.like( cb.function("age",
+                                String.class,
+                                cb.literal(Timestamp.valueOf(LocalDateTime.now())),root.get("dateOfBirth") ),locationName);//.equals(Long.valueOf(locationName));
 
+        
+    }
     @Override
     default Specification<Individual> getFilterSpecForOperatingSubjectScope(User user) {
         OperatingIndividualScope scope = user.getOperatingIndividualScope();

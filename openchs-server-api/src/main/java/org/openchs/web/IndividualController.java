@@ -1,16 +1,18 @@
 package org.openchs.web;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.codehaus.jettison.json.JSONArray;
 import org.joda.time.DateTime;
 import org.openchs.dao.*;
-import org.openchs.domain.AddressLevel;
-import org.openchs.domain.Gender;
-import org.openchs.domain.Individual;
-import org.openchs.domain.SubjectType;
+import org.openchs.domain.*;
 import org.openchs.geo.Point;
 import org.openchs.projection.IndividualWebProjection;
 import org.openchs.service.*;
 import org.openchs.util.S;
 import org.openchs.web.request.*;
+import org.openchs.web.request.rules.ConceptSearchWrapper;
+import org.openchs.web.request.rules.SearchFilter;
 import org.openchs.web.response.ResponsePage;
 import org.openchs.web.response.SubjectResponse;
 import org.slf4j.LoggerFactory;
@@ -50,9 +52,11 @@ public class IndividualController extends AbstractController<Individual> impleme
     private ConceptRepository conceptRepository;
     private ConceptService conceptService;
     private final EncounterService encounterService;
+    private  OrganisationConfig organisationConfig;
+    private OrganisationConfigRepository organisationConfigRepository;
 
     @Autowired
-    public IndividualController(IndividualRepository individualRepository, LocationRepository locationRepository, GenderRepository genderRepository, ObservationService observationService, UserService userService, SubjectTypeRepository subjectTypeRepository, ProjectionFactory projectionFactory, IndividualService individualService, ConceptRepository conceptRepository, ConceptService conceptService,EncounterService encounterService) {
+    public IndividualController(IndividualRepository individualRepository, LocationRepository locationRepository, GenderRepository genderRepository, ObservationService observationService, UserService userService, SubjectTypeRepository subjectTypeRepository, ProjectionFactory projectionFactory, IndividualService individualService, ConceptRepository conceptRepository, ConceptService conceptService,EncounterService encounterService,OrganisationConfigRepository organisationConfigRepository) {
         this.individualRepository = individualRepository;
         this.locationRepository = locationRepository;
         this.genderRepository = genderRepository;
@@ -64,6 +68,8 @@ public class IndividualController extends AbstractController<Individual> impleme
         this.conceptRepository = conceptRepository;
         this.conceptService = conceptService;
         this.encounterService = encounterService;
+        //this.organisationConfig=organisationConfig;
+        this.organisationConfigRepository=organisationConfigRepository;
     }
 
     @RequestMapping(value = "/api/subjects", method = RequestMethod.GET)
@@ -150,6 +156,40 @@ public class IndividualController extends AbstractController<Individual> impleme
 //                .map(t -> projectionFactory.createProjection(IndividualWebProjection.class, t));
         return repo.findAll(
                 where(repo.getFilterSpecForName(query))
+                , pageable)
+                .map(t -> projectionFactory.createProjection(IndividualWebProjection.class, t));
+    }
+
+    @GetMapping(value = "/individual/search/v2")
+    @PreAuthorize(value = "hasAnyAuthority('user', 'organisation_admin')")
+    @ResponseBody
+    public Page<IndividualWebProjection> searchV2(
+            @RequestParam(value = "query", required = false) String query,
+            Pageable pageable)throws Exception {
+
+        OrganisationConfig organisationConfig = organisationConfigRepository.findAll().get(0);
+        System.out.println(query);
+        JsonObject settings = organisationConfig.getSettings();
+        //String jsonString="[{\"type\":\"Concept\",\"scope\":\"programEncounter\",\"titleKey\":\"Fever Search\",\"conceptName\":\"Child has fever\",\"conceptUUID\":\"d5bb90bd-f597-4978-8657-15af7c04621b\",\"conceptDataType\":\"Coded\",\"scopeParameters\":{\"programUUIDs\":[\"352d906c-b386-496c-ba23-91b1468a5613\"],\"encounterTypeUUIDs\":[\"0126df9e-0167-4d44-9a2a-ae41cfc58d3d\"]},\"subjectTypeUUID\":\"9f2af1f9-e150-4f8e-aad3-40bb7eb05aa3\"}]";
+        ObjectMapper objectMapper  = new ObjectMapper();
+        String jsonString=objectMapper.writeValueAsString(settings.get("searchFilters"));
+        ArrayList<SearchFilter> searchFilter = objectMapper.readValue(jsonString, new TypeReference<List<SearchFilter>>() {});
+        System.out.println("List of search filter:-"+searchFilter);
+        IndividualRepository repo = this.individualRepository;
+//        if (query != null && !"".equals(query.trim())) {
+//            return repo.findAll(
+//                            where(repo.getFilterSpecForName(query))
+//                                    .or(repo.getFilterSpecForObs(query))
+//                                    .or(repo.getFilterSpecForAddress(query))
+//                    , pageable)
+//                    .map(t -> projectionFactory.createProjection(IndividualWebProjection.class, t));
+//        }
+        return repo.findAll(
+                where(repo.getFilterSpecForName(query))
+                        .or(repo.getFilterSpecForIndividualType(query))
+                        .or(repo.getFilterSpecForGender(query))
+                        .or(repo.getFilterSpecForAddress(query))
+                        .or(repo.getFilterSpecForAgeRange(query))
                 , pageable)
                 .map(t -> projectionFactory.createProjection(IndividualWebProjection.class, t));
     }
