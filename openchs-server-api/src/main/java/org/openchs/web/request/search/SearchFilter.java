@@ -1,11 +1,7 @@
-package org.openchs.web.request.rules;
+package org.openchs.web.request.search;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import org.openchs.domain.EncounterType;
-import org.openchs.domain.Program;
 
-import java.util.ArrayList;
-import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SearchFilter {
 
@@ -15,8 +11,7 @@ public class SearchFilter {
     private String conceptName;
     private String conceptUUID;
     private String conceptDataType;
-    private List<EncounterType> encounterTypeUUIDs;
-    private List<Program> programUUIDs;
+    private ScopeParameter scopeParameters;
     private String subjectTypeUUID;
 
     public String getType() {
@@ -43,6 +38,14 @@ public class SearchFilter {
         this.titleKey = titleKey;
     }
 
+    public ScopeParameter getScopeParameters() {
+        return scopeParameters;
+    }
+
+    public void setScopeParameters(ScopeParameter scopeParameters) {
+        this.scopeParameters = scopeParameters;
+    }
+
     public String getConceptName() {
         return conceptName;
     }
@@ -67,22 +70,6 @@ public class SearchFilter {
         this.conceptDataType = conceptDataType;
     }
 
-    public List<EncounterType> getEncounterTypeUUIDs() {
-        return encounterTypeUUIDs;
-    }
-
-    public void setEncounterTypeUUIDs(List<EncounterType> encounterTypeUUIDs) {
-        this.encounterTypeUUIDs = encounterTypeUUIDs;
-    }
-
-    public List<Program> getProgramUUIDs() {
-        return programUUIDs;
-    }
-
-    public void setProgramUUIDs(List<Program> programUUIDs) {
-        this.programUUIDs = programUUIDs;
-    }
-
     public String getSubjectTypeUUID() {
         return subjectTypeUUID;
     }
@@ -100,8 +87,7 @@ public class SearchFilter {
                 ", conceptName='" + conceptName + '\'' +
                 ", conceptUUID='" + conceptUUID + '\'' +
                 ", conceptDataType='" + conceptDataType + '\'' +
-                ", encounterTypeUUIDs=" + encounterTypeUUIDs +
-                ", programUUIDs=" + programUUIDs +
+                ", scopeParameters=" + scopeParameters +
                 ", subjectTypeUUID='" + subjectTypeUUID + '\'' +
                 '}';
     }

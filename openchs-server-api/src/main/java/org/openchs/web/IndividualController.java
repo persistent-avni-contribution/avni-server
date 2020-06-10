@@ -2,7 +2,6 @@ package org.openchs.web;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.codehaus.jettison.json.JSONArray;
 import org.joda.time.DateTime;
 import org.openchs.dao.*;
 import org.openchs.domain.*;
@@ -11,8 +10,8 @@ import org.openchs.projection.IndividualWebProjection;
 import org.openchs.service.*;
 import org.openchs.util.S;
 import org.openchs.web.request.*;
-import org.openchs.web.request.rules.ConceptSearchWrapper;
-import org.openchs.web.request.rules.SearchFilter;
+import org.openchs.web.request.search.IndividualSearchRequest;
+import org.openchs.web.request.search.SearchFilter;
 import org.openchs.web.response.ResponsePage;
 import org.openchs.web.response.SubjectResponse;
 import org.slf4j.LoggerFactory;
@@ -164,9 +163,9 @@ public class IndividualController extends AbstractController<Individual> impleme
     @PreAuthorize(value = "hasAnyAuthority('user', 'organisation_admin')")
     @ResponseBody
     public Page<IndividualWebProjection> searchV2(
-            @RequestParam(value = "query", required = false) String query,
+            @RequestParam(value = "query", required = false) String query ,
             Pageable pageable)throws Exception {
-
+        //System.out.println(searchOBJ);
         OrganisationConfig organisationConfig = organisationConfigRepository.findAll().get(0);
         System.out.println(query);
         JsonObject settings = organisationConfig.getSettings();
@@ -186,9 +185,10 @@ public class IndividualController extends AbstractController<Individual> impleme
 //        }
         return repo.findAll(
                 where(repo.getFilterSpecForName(query))
-                        .or(repo.getFilterSpecForIndividualType(query))
+                       /* .or(repo.getFilterSpecForIndividualType(query))
                         .or(repo.getFilterSpecForGender(query))
-                        .or(repo.getFilterSpecForAddress(query))
+                        .or(repo.getFilterSpecForAddress(query))*/
+                        //.or(repo.getFilterSpecForAgeRange(query))
                         .or(repo.getFilterSpecForAgeRange(query))
                 , pageable)
                 .map(t -> projectionFactory.createProjection(IndividualWebProjection.class, t));

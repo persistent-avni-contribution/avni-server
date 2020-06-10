@@ -17,6 +17,8 @@ import java.util.stream.Collectors;
 @Table(name = "individual")
 @JsonIgnoreProperties({"programEnrolments", "encounters", "relationshipsFromSelfToOthers", "relationshipsFromOthersToSelf"})
 @BatchSize(size = 100)
+@SecondaryTable(name="individual_search_view",
+        pkJoinColumns = @PrimaryKeyJoinColumn(name = "individual_id", referencedColumnName = "id"))
 public class Individual extends OrganisationAwareEntity {
 
     @NotNull
@@ -34,6 +36,9 @@ public class Individual extends OrganisationAwareEntity {
     private LocalDate dateOfBirth;
 
     private boolean dateOfBirthVerified;
+
+    @Column(table = "individual_search_view", name = "age")
+    private Long individualAge;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "individuala")
     private Set<IndividualRelationship> relationshipsFromSelfToOthers = new HashSet<>();
@@ -81,6 +86,14 @@ public class Individual extends OrganisationAwareEntity {
         individual.addressLevel = address;
         individual.registrationDate = registrationDate;
         return individual;
+    }
+
+    public Long getIndividualAge() {
+        return individualAge;
+    }
+
+    public void setIndividualAge(Long individualAge) {
+        this.individualAge = individualAge;
     }
 
     public LocalDate getDateOfBirth() {

@@ -108,9 +108,9 @@ public interface IndividualRepository extends TransactionalDataRepository<Indivi
     default Specification<Individual> getFilterSpecForObs(String value) {
         return (Root<Individual> root, CriteriaQuery<?> query, CriteriaBuilder cb) ->
                 value == null ? cb.and() : cb.or(
-                        jsonContains(root.get("observations"), "%" + value + "%", cb),
-                        jsonContains(root.join("programEnrolments", JoinType.LEFT).get("observations"), "%" + value + "%", cb),
-                        jsonContains(root.join("encounters", JoinType.LEFT).get("observations"), "%" + value + "%", cb));
+                        jsonContains(root.get("observations"),  value , cb),
+                        jsonContains(root.join("programEnrolments", JoinType.LEFT).get("observations"),  value , cb),
+                        jsonContains(root.join("encounters", JoinType.LEFT).get("observations"),  value , cb));
 
     }
     default Specification<Individual> getFilterSpecForIndividualType(String value) {
@@ -121,7 +121,7 @@ public interface IndividualRepository extends TransactionalDataRepository<Indivi
     default Specification<Individual> getFilterSpecForGender(String value) {
 
         return (Root<Individual> root, CriteriaQuery<?> query, CriteriaBuilder cb) ->
-                value == null ? cb.and() : root.get("gender").get("uuid").in(value);
+                value == null ?cb.and() : cb.or( root.get("gender").get("uuid").in(value));
     }
     default Specification<Individual> getFilterSpecForLocationIds(List<Long> locationIds) {
         return (Root<Individual> root, CriteriaQuery<?> query, CriteriaBuilder cb) ->
@@ -133,13 +133,11 @@ public interface IndividualRepository extends TransactionalDataRepository<Indivi
                 locationName == null ? cb.and() :
                         cb.like(cb.upper(root.get("addressLevel").get("titleLineage")), "%" + locationName.toUpperCase() + "%");
     }
-    default Specification<Individual> getFilterSpecForAgeRange(String locationName) {
+    default Specification<Individual> getFilterSpecForAgeRange(String age) {
         return (Root<Individual> root, CriteriaQuery<?> query, CriteriaBuilder cb) ->
-                locationName == null ? cb.and() :
-                        cb.like( cb.function("age",
-                                String.class,
-                                cb.literal(Timestamp.valueOf(LocalDateTime.now())),root.get("dateOfBirth") ),locationName);//.equals(Long.valueOf(locationName));
-
+                age == null ? cb.and() :cb.and(cb.greaterThanOrEqualTo(root.get("individualAge"),Long.parseLong(age))
+                ,cb.lessThanOrEqualTo(root.get("individualAge"),Long.parseLong(age))
+                );
         
     }
     @Override
