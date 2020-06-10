@@ -1,10 +1,9 @@
 package org.openchs.dao;
 
 import org.openchs.domain.CHSEntity;
+import org.openchs.domain.Individual;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.*;
 import java.util.List;
 
 public interface CHSRepository<T extends CHSEntity> {
@@ -16,4 +15,10 @@ public interface CHSRepository<T extends CHSEntity> {
         return builder.isTrue(builder.function("jsonb_object_values_contain", Boolean.class,
                 jsonb, builder.literal(pattern)));
     }
+    /*default Predicate toPredicate(Root<Individual> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
+        final Predicate appPredicate = root.join("programEnrolments", JoinType.LEFT)
+                .get("individualId").isNotNull();
+        query.distinct(true);
+        return appPredicate;
+    }*/
 }

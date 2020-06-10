@@ -185,12 +185,13 @@ public class IndividualController extends AbstractController<Individual> impleme
 //        }
         //return ResponseEntity.O().body(e.getMessage());
         return repo.findAll(
-                where(repo.getFilterSpecForName(individualSearchRequest))
+                where(repo.getFilterSpecForVoid(individualSearchRequest))
                        /* .or(repo.getFilterSpecForIndividualType(query))
                         .or(repo.getFilterSpecForGender(query))
                         .or(repo.getFilterSpecForAddress(query))*/
                         //.or(repo.getFilterSpecForAgeRange(query))
-                        .or(repo.getFilterSpecForAgeRange(individualSearchRequest))
+                        .and(repo.getFilterSpecForEnrolmentDateRange(individualSearchRequest))
+                        //.and(repo.getFilterSpecForName(individualSearchRequest))
                 , pageable)
                 .map(t -> projectionFactory.createProjection(IndividualWebProjection.class, t));
     }

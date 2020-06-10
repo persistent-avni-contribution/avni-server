@@ -12,6 +12,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.criteria.*;
+import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -83,10 +84,22 @@ public interface IndividualRepository extends TransactionalDataRepository<Indivi
         return findByFacilityIdAndSubjectTypeUuidAndAuditLastModifiedDateTimeIsBetweenOrderByAuditLastModifiedDateTimeAscIdAsc(facilityId, filters, lastModifiedDateTime, now, pageable);
     }
 
-    default Specification<Individual> getFilterSpecForVoid(Boolean includeVoided) {
+    /*default Specification<Individual> getFilterSpecForVoid(IndividualSearchRequest individualSearchRequest) {
+
+
         return (Root<Individual> root, CriteriaQuery<?> query, CriteriaBuilder cb) ->
-                includeVoided == null || includeVoided ? cb.and() : cb.isFalse(root.get("isVoided"));
+                !individualSearchRequest.isIncludeVoided()  ? cb.and() : cb.or( cb.isTrue(root.get("isVoided")));
+
+    }*/
+    default Specification<Individual> getFilterSpecForVoid(IndividualSearchRequest individualSearchRequest) {
+        Boolean includeVoided=individualSearchRequest.isIncludeVoided();
+        return (Root<Individual> root, CriteriaQuery<?> query, CriteriaBuilder cb) ->
+                 includeVoided ? cb.or(cb.isTrue(root.get("isVoided")),cb.isFalse(root.get("isVoided"))) :
+                        cb.isFalse(root.get("isVoided"))  ;
+
+
     }
+
 
     default Specification<Individual> getFilterSpecForName(IndividualSearchRequest individualSearchRequest) {
         return (Root<Individual> root, CriteriaQuery<?> query, CriteriaBuilder cb) -> {
@@ -138,9 +151,23 @@ public interface IndividualRepository extends TransactionalDataRepository<Indivi
 
     default Specification<Individual> getFilterSpecForAgeRange(IndividualSearchRequest  individualSearchRequest) {
         return (Root<Individual> root, CriteriaQuery<?> query, CriteriaBuilder cb) ->
-                individualSearchRequest == null ? cb.and() :cb.or(cb.and(cb.greaterThanOrEqualTo(root.get("individualAge"),individualSearchRequest.getAge().getMinValueInt())
+                (individualSearchRequest == null && individualSearchRequest.getAge()==null ) ? cb.and() :cb.or(cb.and(cb.greaterThanOrEqualTo(root.get("individualAge"),individualSearchRequest.getAge().getMinValueInt())
                 ,cb.lessThanOrEqualTo(root.get("individualAge"),individualSearchRequest.getAge().getMaxValueInt())
                 ));
+    }
+    default Specification<Individual> getFilterSpecForRegistrationDateRange(IndividualSearchRequest  individualSearchRequest) {
+        return (Root<Individual> root, CriteriaQuery<?> query, CriteriaBuilder cb) ->
+                (individualSearchRequest == null && individualSearchRequest.getRegistrationDate()==null ) ? cb.and() :cb.or(cb.and(cb.greaterThanOrEqualTo(root.get("registrationDate"),individualSearchRequest.getRegistrationDate().getMinValue())
+                        ,cb.lessThanOrEqualTo(root.get("registrationDate"),individualSearchRequest.getRegistrationDate().getMaxValue())
+                ));
+    }
+    default Specification<Individual> getFilterSpecForEnrolmentDateRange(IndividualSearchRequest  individualSearchRequest) {
+        return (Root<Individual> root, CriteriaQuery<?> query, CriteriaBuilder cb) ->
+
+                (individualSearchRequest == null && individualSearchRequest.getEnrolmentDate()==null ) ? cb.and() : cb.or(
+                        cb.and(cb.greaterThanOrEqualTo(root.join("programEnrolments", JoinType.LEFT).get("enrolmentDateTime"),new DateTime( individualSearchRequest.getEnrolmentDate().getMinValue().toDate()))
+                        ,cb.lessThanOrEqualTo(root.join("programEnrolments", JoinType.LEFT).get("enrolmentDateTime"),new DateTime( individualSearchRequest.getEnrolmentDate().getMaxValue().toDate()))
+                        ) );
     }
 
     @Override
@@ -165,4 +192,5 @@ public interface IndividualRepository extends TransactionalDataRepository<Indivi
     Page<Individual> findIndividuals(String subjectTypeUUID, Pageable pageable);
 
     Individual findByLegacyId(String legacyId);
+
 }
