@@ -1,6 +1,6 @@
 package org.openchs.web.request.search;
 
-import java.time.LocalDate;
+import org.joda.time.LocalDate;
 
 public class MinMax {
 
@@ -8,9 +8,9 @@ public class MinMax {
 
     private LocalDate maxValue;
 
-    private Integer minValueInt;
+    private Long minValueInt;
 
-    private Integer maxValueInt;
+    private Long maxValueInt;
 
     public LocalDate getMinValue() {
         return minValue;
@@ -26,5 +26,29 @@ public class MinMax {
 
     public void setMaxValue(LocalDate maxValue) {
         this.maxValue = maxValue;
+    }
+
+    public Long getMinValueInt() {
+        return minValueInt;
+    }
+
+    public void setMinValueInt(Long minValueInt) {
+        this.minValueInt = minValueInt;
+    }
+
+    public Long getMaxValueInt() {
+        return maxValueInt;
+    }
+
+    public void setMaxValueInt(Long maxValueInt) {
+        this.maxValueInt = maxValueInt;
+    }
+
+    @Override
+    public String toString() {
+        return "{" +
+                "minValue=" + minValue +
+                ", maxValue=" + maxValue +
+                '}';
     }
 }

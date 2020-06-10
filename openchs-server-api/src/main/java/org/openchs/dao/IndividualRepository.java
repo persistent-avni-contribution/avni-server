@@ -2,6 +2,7 @@ package org.openchs.dao;
 
 import org.joda.time.DateTime;
 import org.openchs.domain.*;
+import org.openchs.web.request.search.IndividualSearchRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -87,8 +88,9 @@ public interface IndividualRepository extends TransactionalDataRepository<Indivi
                 includeVoided == null || includeVoided ? cb.and() : cb.isFalse(root.get("isVoided"));
     }
 
-    default Specification<Individual> getFilterSpecForName(String value) {
+    default Specification<Individual> getFilterSpecForName(IndividualSearchRequest individualSearchRequest) {
         return (Root<Individual> root, CriteriaQuery<?> query, CriteriaBuilder cb) -> {
+           String value  = individualSearchRequest.getName();
             if (value != null){
                 Predicate[] predicates = new Predicate[2];
                 String[] values = value.trim().split(" ");
@@ -133,13 +135,14 @@ public interface IndividualRepository extends TransactionalDataRepository<Indivi
                 locationName == null ? cb.and() :
                         cb.like(cb.upper(root.get("addressLevel").get("titleLineage")), "%" + locationName.toUpperCase() + "%");
     }
-    default Specification<Individual> getFilterSpecForAgeRange(String age) {
+
+    default Specification<Individual> getFilterSpecForAgeRange(IndividualSearchRequest  individualSearchRequest) {
         return (Root<Individual> root, CriteriaQuery<?> query, CriteriaBuilder cb) ->
-                age == null ? cb.and() :cb.and(cb.greaterThanOrEqualTo(root.get("individualAge"),Long.parseLong(age))
-                ,cb.lessThanOrEqualTo(root.get("individualAge"),Long.parseLong(age))
-                );
-        
+                individualSearchRequest == null ? cb.and() :cb.or(cb.and(cb.greaterThanOrEqualTo(root.get("individualAge"),individualSearchRequest.getAge().getMinValueInt())
+                ,cb.lessThanOrEqualTo(root.get("individualAge"),individualSearchRequest.getAge().getMaxValueInt())
+                ));
     }
+
     @Override
     default Specification<Individual> getFilterSpecForOperatingSubjectScope(User user) {
         OperatingIndividualScope scope = user.getOperatingIndividualScope();

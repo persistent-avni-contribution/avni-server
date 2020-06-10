@@ -14,6 +14,7 @@ import org.openchs.web.request.search.IndividualSearchRequest;
 import org.openchs.web.request.search.SearchFilter;
 import org.openchs.web.response.ResponsePage;
 import org.openchs.web.response.SubjectResponse;
+import org.openchs.web.validation.ValidationException;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -127,7 +128,7 @@ public class IndividualController extends AbstractController<Individual> impleme
         }
     }
 
-    @GetMapping(value = "/individual/search")
+ /*   @GetMapping(value = "/individual/search")
     @PreAuthorize(value = "hasAnyAuthority('user', 'organisation_admin')")
     @ResponseBody
     public Page<IndividualWebProjection> search(
@@ -154,20 +155,19 @@ public class IndividualController extends AbstractController<Individual> impleme
 //                , pageable)
 //                .map(t -> projectionFactory.createProjection(IndividualWebProjection.class, t));
         return repo.findAll(
-                where(repo.getFilterSpecForName(query))
+                where(repo.getFilterSpecForName(individualSearchRequest))
                 , pageable)
                 .map(t -> projectionFactory.createProjection(IndividualWebProjection.class, t));
-    }
+    }*/
 
-    @GetMapping(value = "/individual/search/v2")
+    @PostMapping(value = "/individual/search/v2")
     @PreAuthorize(value = "hasAnyAuthority('user', 'organisation_admin')")
-    @ResponseBody
-    public Page<IndividualWebProjection> searchV2(
-            @RequestParam(value = "query", required = false) String query ,
-            Pageable pageable)throws Exception {
+    public Page<IndividualWebProjection> searchV2(@RequestBody  IndividualSearchRequest individualSearchRequest,
+        Pageable pageable)
+            throws Exception {
         //System.out.println(searchOBJ);
         OrganisationConfig organisationConfig = organisationConfigRepository.findAll().get(0);
-        System.out.println(query);
+        System.out.println(individualSearchRequest);
         JsonObject settings = organisationConfig.getSettings();
         //String jsonString="[{\"type\":\"Concept\",\"scope\":\"programEncounter\",\"titleKey\":\"Fever Search\",\"conceptName\":\"Child has fever\",\"conceptUUID\":\"d5bb90bd-f597-4978-8657-15af7c04621b\",\"conceptDataType\":\"Coded\",\"scopeParameters\":{\"programUUIDs\":[\"352d906c-b386-496c-ba23-91b1468a5613\"],\"encounterTypeUUIDs\":[\"0126df9e-0167-4d44-9a2a-ae41cfc58d3d\"]},\"subjectTypeUUID\":\"9f2af1f9-e150-4f8e-aad3-40bb7eb05aa3\"}]";
         ObjectMapper objectMapper  = new ObjectMapper();
@@ -183,15 +183,23 @@ public class IndividualController extends AbstractController<Individual> impleme
 //                    , pageable)
 //                    .map(t -> projectionFactory.createProjection(IndividualWebProjection.class, t));
 //        }
+        //return ResponseEntity.O().body(e.getMessage());
         return repo.findAll(
-                where(repo.getFilterSpecForName(query))
+                where(repo.getFilterSpecForName(individualSearchRequest))
                        /* .or(repo.getFilterSpecForIndividualType(query))
                         .or(repo.getFilterSpecForGender(query))
                         .or(repo.getFilterSpecForAddress(query))*/
                         //.or(repo.getFilterSpecForAgeRange(query))
-                        .or(repo.getFilterSpecForAgeRange(query))
+                        .or(repo.getFilterSpecForAgeRange(individualSearchRequest))
                 , pageable)
                 .map(t -> projectionFactory.createProjection(IndividualWebProjection.class, t));
+    }
+
+    @RequestMapping(value = "/searchFilter", method = RequestMethod.POST)
+    @PreAuthorize(value = "hasAnyAuthority('user', 'organisation_admin')")
+    public ResponseEntity<?> saveDependency(@RequestBody  IndividualSearchRequest individualSearchRequest) {
+        System.out.println(individualSearchRequest);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @GetMapping(value = "/web/individual/{uuid}")
