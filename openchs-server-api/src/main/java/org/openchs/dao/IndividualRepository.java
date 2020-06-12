@@ -1,6 +1,9 @@
 package org.openchs.dao;
 
+import jdk.nashorn.internal.parser.DateParser;
+import org.hibernate.criterion.Restrictions;
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 import org.openchs.domain.*;
 import org.openchs.web.request.search.IndividualSearchRequest;
 import org.springframework.data.domain.Page;
@@ -10,15 +13,23 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Repository;
+import software.amazon.ion.impl.PrivateScalarConversions;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import javax.persistence.TypedQuery;
 import javax.persistence.criteria.*;
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.text.DateFormat;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.openchs.domain.OperatingIndividualScope.ByCatchment;
 import static org.openchs.domain.OperatingIndividualScope.ByFacility;
+import static org.springframework.data.jpa.domain.Specification.where;
 
 @Repository
 @RepositoryRestResource(collectionResourceRel = "individual", path = "individual", exported = false)
@@ -128,16 +139,18 @@ public interface IndividualRepository extends TransactionalDataRepository<Indivi
                         jsonContains(root.join("encounters", JoinType.LEFT).get("observations"),  value , cb));
 
     }
+
     default Specification<Individual> getFilterSpecForIndividualType(String value) {
 
         return (Root<Individual> root, CriteriaQuery<?> query, CriteriaBuilder cb) ->
                 value == null ? cb.and() : root.get("subjectType").get("uuid").in(value);
     }
-    default Specification<Individual> getFilterSpecForGender(String value) {
 
+    default Specification<Individual> getFilterSpecForGender(IndividualSearchRequest individualSearchRequest) {
         return (Root<Individual> root, CriteriaQuery<?> query, CriteriaBuilder cb) ->
-                value == null ?cb.and() : cb.or( root.get("gender").get("uuid").in(value));
+                individualSearchRequest.getGender() == null ?cb.and() : cb.or(root.get("gender").get("uuid").in(individualSearchRequest.getGender()));
     }
+
     default Specification<Individual> getFilterSpecForLocationIds(List<Long> locationIds) {
         return (Root<Individual> root, CriteriaQuery<?> query, CriteriaBuilder cb) ->
                 locationIds == null ? cb.and() : root.get("addressLevel").get("id").in(locationIds);
@@ -155,19 +168,23 @@ public interface IndividualRepository extends TransactionalDataRepository<Indivi
                 ,cb.lessThanOrEqualTo(root.get("individualAge"),individualSearchRequest.getAge().getMaxValueInt())
                 ));
     }
+
     default Specification<Individual> getFilterSpecForRegistrationDateRange(IndividualSearchRequest  individualSearchRequest) {
         return (Root<Individual> root, CriteriaQuery<?> query, CriteriaBuilder cb) ->
-                (individualSearchRequest == null && individualSearchRequest.getRegistrationDate()==null ) ? cb.and() :cb.or(cb.and(cb.greaterThanOrEqualTo(root.get("registrationDate"),individualSearchRequest.getRegistrationDate().getMinValue())
+                (individualSearchRequest == null && individualSearchRequest.getRegistrationDate()==null ) ? cb.and() :cb.or(cb.and(
+                        cb.greaterThanOrEqualTo(root.get("registrationDate"),individualSearchRequest.getRegistrationDate().getMinValue())
                         ,cb.lessThanOrEqualTo(root.get("registrationDate"),individualSearchRequest.getRegistrationDate().getMaxValue())
                 ));
     }
+
     default Specification<Individual> getFilterSpecForEnrolmentDateRange(IndividualSearchRequest  individualSearchRequest) {
         return (Root<Individual> root, CriteriaQuery<?> query, CriteriaBuilder cb) ->
-
-                (individualSearchRequest == null && individualSearchRequest.getEnrolmentDate()==null ) ? cb.and() : cb.or(
-                        cb.and(cb.greaterThanOrEqualTo(root.join("programEnrolments", JoinType.LEFT).get("enrolmentDateTime"),new DateTime( individualSearchRequest.getEnrolmentDate().getMinValue().toDate()))
-                        ,cb.lessThanOrEqualTo(root.join("programEnrolments", JoinType.LEFT).get("enrolmentDateTime"),new DateTime( individualSearchRequest.getEnrolmentDate().getMaxValue().toDate()))
-                        ) );
+                (individualSearchRequest == null && individualSearchRequest.getEnrolmentDate() == null) ? cb.and() : cb.or(
+                    cb.and(cb.greaterThanOrEqualTo(root.join("programEnrolments", JoinType.LEFT).get("enrolmentDateTime").as(Date.class),
+                                     individualSearchRequest.getEnrolmentDate().getMinValue().toDate())
+                            , cb.lessThanOrEqualTo(root.join("programEnrolments", JoinType.LEFT).get("enrolmentDateTime").as(Date.class),
+                                    individualSearchRequest.getEnrolmentDate().getMaxValue().toDate())
+                    ));
     }
 
     @Override

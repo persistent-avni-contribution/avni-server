@@ -163,7 +163,7 @@ public class IndividualController extends AbstractController<Individual> impleme
     @PostMapping(value = "/individual/search/v2")
     @PreAuthorize(value = "hasAnyAuthority('user', 'organisation_admin')")
     public Page<IndividualWebProjection> searchV2(@RequestBody  IndividualSearchRequest individualSearchRequest,
-        Pageable pageable)
+                                                  Pageable pageable)
             throws Exception {
         //System.out.println(searchOBJ);
         OrganisationConfig organisationConfig = organisationConfigRepository.findAll().get(0);
@@ -184,24 +184,27 @@ public class IndividualController extends AbstractController<Individual> impleme
 //                    .map(t -> projectionFactory.createProjection(IndividualWebProjection.class, t));
 //        }
         //return ResponseEntity.O().body(e.getMessage());
+
         return repo.findAll(
                 where(repo.getFilterSpecForVoid(individualSearchRequest))
-                       /* .or(repo.getFilterSpecForIndividualType(query))
-                        .or(repo.getFilterSpecForGender(query))
-                        .or(repo.getFilterSpecForAddress(query))*/
+                       //.or(repo.getFilterSpecForIndividualType(query))
+                        //.and(repo.getFilterSpecForGender(individualSearchRequest))
+                        //.or(repo.getFilterSpecForAddress(query))
                         //.or(repo.getFilterSpecForAgeRange(query))
                         .and(repo.getFilterSpecForEnrolmentDateRange(individualSearchRequest))
                         //.and(repo.getFilterSpecForName(individualSearchRequest))
-                , pageable)
+                 , pageable)
                 .map(t -> projectionFactory.createProjection(IndividualWebProjection.class, t));
     }
 
-    @RequestMapping(value = "/searchFilter", method = RequestMethod.POST)
+    // return encounterService.getAllCompletedEncounters(uuid,encounterTypeUuids,encounterDateTime,earliestVisitDateTime,pageable);
+
+    /*@RequestMapping(value = "/searchFilter", method = RequestMethod.POST)
     @PreAuthorize(value = "hasAnyAuthority('user', 'organisation_admin')")
     public ResponseEntity<?> saveDependency(@RequestBody  IndividualSearchRequest individualSearchRequest) {
         System.out.println(individualSearchRequest);
         return new ResponseEntity<>(HttpStatus.CREATED);
-    }
+    }*/
 
     @GetMapping(value = "/web/individual/{uuid}")
     @PreAuthorize(value = "hasAnyAuthority('user')")

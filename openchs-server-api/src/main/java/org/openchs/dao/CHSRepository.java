@@ -1,5 +1,6 @@
 package org.openchs.dao;
 
+import org.joda.time.DateTime;
 import org.openchs.domain.CHSEntity;
 import org.openchs.domain.Individual;
 
@@ -15,10 +16,9 @@ public interface CHSRepository<T extends CHSEntity> {
         return builder.isTrue(builder.function("jsonb_object_values_contain", Boolean.class,
                 jsonb, builder.literal(pattern)));
     }
-    /*default Predicate toPredicate(Root<Individual> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
-        final Predicate appPredicate = root.join("programEnrolments", JoinType.LEFT)
-                .get("individualId").isNotNull();
-        query.distinct(true);
-        return appPredicate;
-    }*/
+
+    default Predicate enrolmentdate(Path<?> jsonb, String pattern, CriteriaBuilder builder) {
+        return builder.isTrue(builder.function("enrolment_date_contain", Boolean.class,
+                jsonb, builder.literal(pattern)));
+    }
 }

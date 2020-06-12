@@ -10,7 +10,7 @@ public class IndividualSearchRequest {
 
     private boolean includeVoided;
 
-    private String gender;
+    private List<String> gender;
 
     private String subjectType;
 
@@ -52,11 +52,11 @@ public class IndividualSearchRequest {
         this.includeVoided = includeVoided;
     }
 
-    public String getGender() {
+    public List<String> getGender() {
         return gender;
     }
 
-    public void setGender(String gender) {
+    public void setGender(List<String> gender) {
         this.gender = gender;
     }
 
