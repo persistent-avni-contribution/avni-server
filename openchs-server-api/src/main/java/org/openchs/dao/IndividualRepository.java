@@ -1,6 +1,7 @@
 package org.openchs.dao;
 
 import jdk.nashorn.internal.parser.DateParser;
+import org.hibernate.Criteria;
 import org.hibernate.criterion.Restrictions;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
@@ -131,12 +132,13 @@ public interface IndividualRepository extends TransactionalDataRepository<Indivi
         };
     }
 
-    default Specification<Individual> getFilterSpecForObs(String value) {
+    default Specification<Individual> getFilterSpecForObs(Long id) {
         return (Root<Individual> root, CriteriaQuery<?> query, CriteriaBuilder cb) ->
-                value == null ? cb.and() : cb.or(
-                        jsonContains(root.get("observations"),  value , cb),
-                        jsonContains(root.join("programEnrolments", JoinType.LEFT).get("observations"),  value , cb),
-                        jsonContains(root.join("encounters", JoinType.LEFT).get("observations"),  value , cb));
+                id == null ? cb.and() : cb.or(
+                        observationsdata(root.get("uuid"),"2","abc","abc", cb));
+                        //jsonContains(root.get("observations"), value , cb),
+                        //jsonContains(root.join("programEnrolments", JoinType.LEFT).get("observations"),  value , cb),
+                        //jsonContains(root.join("encounters", JoinType.LEFT).get("observations"),  value , cb));
 
     }
 
@@ -186,6 +188,25 @@ public interface IndividualRepository extends TransactionalDataRepository<Indivi
                                     individualSearchRequest.getEnrolmentDate().getMaxValue().toDate())
                     ));
     }
+
+    default Specification<Individual> getFilterSpecForEncounterDateRange(IndividualSearchRequest  individualSearchRequest) {
+        return (Root<Individual> root, CriteriaQuery<?> query, CriteriaBuilder cb) ->
+                (individualSearchRequest == null && individualSearchRequest.getEnrolmentDate() == null) ? cb.and() : cb.or(
+                        cb.and(cb.greaterThanOrEqualTo(root.join("programEnrolments", JoinType.LEFT).join("programEncounters", JoinType.LEFT).get("encounterDateTime").as(Date.class),
+                                individualSearchRequest.getEnrolmentDate().getMinValue().toDate())
+                                , cb.lessThanOrEqualTo(root.join("programEnrolments", JoinType.LEFT).join("programEncounters", JoinType.LEFT).get("encounterDateTime").as(Date.class),
+                                        individualSearchRequest.getEnrolmentDate().getMaxValue().toDate())
+                        ));
+    }
+   /* default Specification<Individual> getFilterSpecForEncounterDateRange(IndividualSearchRequest  individualSearchRequest) {
+        return (Root<Individual> root, CriteriaQuery<?> query, CriteriaBuilder cb) ->
+                (individualSearchRequest == null && individualSearchRequest.getEnrolmentDate() == null) ? cb.and() : cb.or(
+                        cb.and(cb.greaterThanOrEqualTo(root.join("programEnrolments", JoinType.LEFT).get("programEncounters").get("encounterDateTime").as(Date.class),
+                                individualSearchRequest.getEnrolmentDate().getMinValue().toDate())
+                                , cb.lessThanOrEqualTo(root.join("programEnrolments", JoinType.LEFT).get("programEncounters").get("encounterDateTime").as(Date.class),
+                                        individualSearchRequest.getEnrolmentDate().getMaxValue().toDate())
+                        ));
+    }*/
 
     @Override
     default Specification<Individual> getFilterSpecForOperatingSubjectScope(User user) {

@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.projection.ProjectionFactory;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.hateoas.Link;
@@ -191,7 +192,9 @@ public class IndividualController extends AbstractController<Individual> impleme
                         //.and(repo.getFilterSpecForGender(individualSearchRequest))
                         //.or(repo.getFilterSpecForAddress(query))
                         //.or(repo.getFilterSpecForAgeRange(query))
-                        .and(repo.getFilterSpecForEnrolmentDateRange(individualSearchRequest))
+                        //.and(repo.getFilterSpecForEnrolmentDateRange(individualSearchRequest))
+                        .and(repo.getFilterSpecForObs(10L))
+                        //.and(repo.getFilterSpecForProgramEncounterDateRange(individualSearchRequest))
                         //.and(repo.getFilterSpecForName(individualSearchRequest))
                  , pageable)
                 .map(t -> projectionFactory.createProjection(IndividualWebProjection.class, t));
