@@ -106,10 +106,8 @@ public interface IndividualRepository extends TransactionalDataRepository<Indivi
     default Specification<Individual> getFilterSpecForVoid(IndividualSearchRequest individualSearchRequest) {
         Boolean includeVoided=individualSearchRequest.isIncludeVoided();
         return (Root<Individual> root, CriteriaQuery<?> query, CriteriaBuilder cb) ->
-                 includeVoided ? cb.or(cb.isTrue(root.get("isVoided")),cb.isFalse(root.get("isVoided"))) :
+                includeVoided ? cb.or(cb.isTrue(root.get("isVoided")),cb.isFalse(root.get("isVoided"))) :
                         cb.isFalse(root.get("isVoided"))  ;
-
-
     }
 
 
@@ -132,13 +130,13 @@ public interface IndividualRepository extends TransactionalDataRepository<Indivi
         };
     }
 
-    default Specification<Individual> getFilterSpecForObs(Long id) {
+    default Specification<Individual> getFilterSpecForObs(String uuid) {
         return (Root<Individual> root, CriteriaQuery<?> query, CriteriaBuilder cb) ->
-                id == null ? cb.and() : cb.or(
-                        observationsdata(root.get("uuid"),"2","abc","abc", cb));
-                        //jsonContains(root.get("observations"), value , cb),
-                        //jsonContains(root.join("programEnrolments", JoinType.LEFT).get("observations"),  value , cb),
-                        //jsonContains(root.join("encounters", JoinType.LEFT).get("observations"),  value , cb));
+                uuid == null ? cb.and() : cb.or(
+                        observationsdata(root.get("uuid"),"2","abc","abc", "CODED", cb));
+        //jsonContains(root.get("observations"), value , cb),
+        //jsonContains(root.join("programEnrolments", JoinType.LEFT).get("observations"),  value , cb),
+        //jsonContains(root.join("encounters", JoinType.LEFT).get("observations"),  value , cb));
 
     }
 
@@ -203,7 +201,7 @@ public interface IndividualRepository extends TransactionalDataRepository<Indivi
                 (individualSearchRequest == null && individualSearchRequest.getEnrolmentDate() == null) ? cb.and() : cb.or(
                         cb.and(cb.greaterThanOrEqualTo(root.join("encounters", JoinType.LEFT).get("encounterDateTime").as(Date.class),
                                 individualSearchRequest.getEnrolmentDate().getMinValue().toDate())
-                                , cb.lessThanOrEqualTo(root.join("programEnrolments", JoinType.LEFT).get("encounterDateTime").as(Date.class),
+                                , cb.lessThanOrEqualTo(root.join("encounters", JoinType.LEFT).get("encounterDateTime").as(Date.class),
                                         individualSearchRequest.getEnrolmentDate().getMaxValue().toDate())
                         ));
     }

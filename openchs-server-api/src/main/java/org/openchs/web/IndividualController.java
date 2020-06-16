@@ -191,7 +191,7 @@ public class IndividualController extends AbstractController<Individual> impleme
                         //.or(repo.getFilterSpecForAddress(query))
                         //.or(repo.getFilterSpecForAgeRange(query))
                         //.and(repo.getFilterSpecForEnrolmentDateRange(individualSearchRequest))
-                        .and(repo.getFilterSpecForObs(10L))
+                        .and(repo.getFilterSpecForObs("10"))
                         //.and(repo.getFilterSpecForProgramEncounterDateRange(individualSearchRequest))
                         //.and(repo.getFilterSpecForName(individualSearchRequest))
                  , pageable)

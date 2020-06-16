@@ -17,9 +17,9 @@ public interface CHSRepository<T extends CHSEntity> {
                 jsonb, builder.literal(pattern)));
     }
 
-    default Predicate observationsdata(Path<?> uuid, String uuidKey, String valueAns, String searchIn, CriteriaBuilder builder) {
+    default Predicate observationsdata(Path<?> uuid, String uuidKey, String valueAns, String searchIn, String pattern, CriteriaBuilder builder) {
         return builder.isTrue(builder.function("jsonb_object_values_contain_single_coded", Boolean.class,
-                uuid, builder.literal(uuidKey),builder.literal(valueAns), builder.literal(searchIn)));
+                uuid, builder.literal(uuidKey),builder.literal(valueAns), builder.literal(searchIn), builder.literal(pattern)));
     }
 
 
