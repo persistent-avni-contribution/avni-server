@@ -176,16 +176,14 @@ public class IndividualController extends AbstractController<Individual> impleme
         ArrayList<SearchFilter> searchFilter = objectMapper.readValue(jsonString, new TypeReference<List<SearchFilter>>() {});
         System.out.println("List of search filter:-"+searchFilter);
         IndividualRepository repo = this.individualRepository;
-//        if (query != null && !"".equals(query.trim())) {
-//            return repo.findAll(
-//                            where(repo.getFilterSpecForName(query))
-//                                    .or(repo.getFilterSpecForObs(query))
-//                                    .or(repo.getFilterSpecForAddress(query))
-//                    , pageable)
-//                    .map(t -> projectionFactory.createProjection(IndividualWebProjection.class, t));
-//        }
-        //return ResponseEntity.O().body(e.getMessage());
+       if (null !=individualSearchRequest && null!=individualSearchRequest.getSearchAll() &&  "searchall".equalsIgnoreCase(individualSearchRequest.getSearchAll().trim())) {
+           individualSearchRequest.setIncludeVoided(false);
+           return repo.findAll(
+                   where(repo.getFilterSpecForVoid(individualSearchRequest))
+                   , pageable)
+                   .map(t -> projectionFactory.createProjection(IndividualWebProjection.class, t));
 
+       }
         return repo.findAll(
                 where(repo.getFilterSpecForVoid(individualSearchRequest))
                        //.or(repo.getFilterSpecForIndividualType(query))
