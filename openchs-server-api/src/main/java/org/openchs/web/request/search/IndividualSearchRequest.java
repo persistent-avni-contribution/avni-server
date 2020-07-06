@@ -1,5 +1,9 @@
 package org.openchs.web.request.search;
 
+
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import java.util.*;
 
 public class IndividualSearchRequest {
@@ -15,17 +19,17 @@ public class IndividualSearchRequest {
     private String subjectType;
 
     private List<Long>  addressIds;
-
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private MinMax registrationDate;
 
     private List<Concepts> concept;
 
     private String searchAll;
-
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private MinMax encounterDate;
-
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private MinMax programEncounterDate;
-
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private MinMax enrolmentDate;
 
 

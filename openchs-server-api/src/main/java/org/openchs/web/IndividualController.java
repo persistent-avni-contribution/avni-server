@@ -174,7 +174,7 @@ public class IndividualController extends AbstractController<Individual> impleme
         ObjectMapper objectMapper  = new ObjectMapper();
         String jsonString=objectMapper.writeValueAsString(settings.get("searchFilters"));
         ArrayList<SearchFilter> searchFilter = objectMapper.readValue(jsonString, new TypeReference<List<SearchFilter>>() {});
-        System.out.println("List of search filter:-"+searchFilter);
+        System.out.println("individualSearchRequest :-"+individualSearchRequest);
         IndividualRepository repo = this.individualRepository;
        if (null !=individualSearchRequest && null!=individualSearchRequest.getSearchAll() &&  "searchall".equalsIgnoreCase(individualSearchRequest.getSearchAll().trim())) {
            individualSearchRequest.setIncludeVoided(false);
@@ -190,10 +190,10 @@ public class IndividualController extends AbstractController<Individual> impleme
                         .and(repo.getFilterSpecForGender(individualSearchRequest))
                         .and(repo.getFilterSpecForLocationIds(individualSearchRequest))
                         .and(repo.getFilterSpecForAgeRange(individualSearchRequest))
-                        .and(repo.getFilterSpecForProgramEnrolmentDateRange(individualSearchRequest))
+                      //  .and(repo.getFilterSpecForProgramEnrolmentDateRange(individualSearchRequest))
                         .and(repo.getFilterSpecForIndividualType(individualSearchRequest))
-                        .and(repo.getFilterSpecForProgramEncounterDateRange(individualSearchRequest))
-                        .and(repo.getFilterSpecForEncounterDateRange(individualSearchRequest))
+                        //.and(repo.getFilterSpecForProgramEncounterDateRange(individualSearchRequest))
+                        //.and(repo.getFilterSpecForEncounterDateRange(individualSearchRequest))
                         .and(repo.getFilterSpecForName(individualSearchRequest))
                  , pageable)
                 .map(t -> projectionFactory.createProjection(IndividualWebProjection.class, t));

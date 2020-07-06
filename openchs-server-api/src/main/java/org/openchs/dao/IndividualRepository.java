@@ -171,7 +171,7 @@ public interface IndividualRepository extends TransactionalDataRepository<Indivi
 
     default Specification<Individual> getFilterSpecForRegistrationDateRange(IndividualSearchRequest  individualSearchRequest) {
         return (Root<Individual> root, CriteriaQuery<?> query, CriteriaBuilder cb) ->
-                ( individualSearchRequest.getEnrolmentDate() == null && null==individualSearchRequest.getEnrolmentDate().getMaxValue() && null==individualSearchRequest.getEnrolmentDate().getMinValue() ) ? null : cb.and(
+                ( individualSearchRequest.getRegistrationDate() == null && null==individualSearchRequest.getRegistrationDate().getMaxValue() && null==individualSearchRequest.getRegistrationDate().getMinValue() ) ? null : cb.and(
                         cb.greaterThanOrEqualTo(root.get("registrationDate"),individualSearchRequest.getRegistrationDate().getMinValue())
                         ,cb.lessThanOrEqualTo(root.get("registrationDate"),individualSearchRequest.getRegistrationDate().getMaxValue())
                 );
@@ -189,20 +189,20 @@ public interface IndividualRepository extends TransactionalDataRepository<Indivi
 
     default Specification<Individual> getFilterSpecForProgramEncounterDateRange(IndividualSearchRequest  individualSearchRequest) {
         return (Root<Individual> root, CriteriaQuery<?> query, CriteriaBuilder cb) ->
-                ( individualSearchRequest.getEnrolmentDate() == null && null==individualSearchRequest.getEnrolmentDate().getMaxValue() && null==individualSearchRequest.getEnrolmentDate().getMinValue() ) ? null :
+                ( individualSearchRequest.getProgramEncounterDate() == null && null==individualSearchRequest.getProgramEncounterDate().getMaxValue() && null==individualSearchRequest.getProgramEncounterDate().getMinValue() ) ? null :
                         cb.and(cb.greaterThanOrEqualTo(root.join("programEnrolments", JoinType.LEFT).join("programEncounters", JoinType.LEFT).get("encounterDateTime").as(Date.class),
-                                individualSearchRequest.getEnrolmentDate().getMinValue().toDate())
+                                individualSearchRequest.getProgramEncounterDate().getMinValue().toDate())
                                 , cb.lessThanOrEqualTo(root.join("programEnrolments", JoinType.LEFT).join("programEncounters", JoinType.LEFT).get("encounterDateTime").as(Date.class),
-                                        individualSearchRequest.getEnrolmentDate().getMaxValue().toDate())
+                                        individualSearchRequest.getProgramEncounterDate().getMaxValue().toDate())
                         );
     }
     default Specification<Individual> getFilterSpecForEncounterDateRange(IndividualSearchRequest  individualSearchRequest) {
         return (Root<Individual> root, CriteriaQuery<?> query, CriteriaBuilder cb) ->
-                ( individualSearchRequest.getEnrolmentDate() == null && null==individualSearchRequest.getEnrolmentDate().getMaxValue() && null==individualSearchRequest.getEnrolmentDate().getMinValue() )? null :
+                ( individualSearchRequest.getEncounterDate() == null && null==individualSearchRequest.getEncounterDate().getMaxValue() && null==individualSearchRequest.getEncounterDate().getMinValue() )? null :
                         cb.and(cb.greaterThanOrEqualTo(root.join("encounters", JoinType.LEFT).get("encounterDateTime").as(Date.class),
-                                individualSearchRequest.getEnrolmentDate().getMinValue().toDate())
+                                individualSearchRequest.getEncounterDate().getMinValue().toDate())
                                 , cb.lessThanOrEqualTo(root.join("encounters", JoinType.LEFT).get("encounterDateTime").as(Date.class),
-                                        individualSearchRequest.getEnrolmentDate().getMaxValue().toDate())
+                                        individualSearchRequest.getEncounterDate().getMaxValue().toDate())
                         );
     }
 
