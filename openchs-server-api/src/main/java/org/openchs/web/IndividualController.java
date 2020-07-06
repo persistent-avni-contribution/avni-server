@@ -180,6 +180,15 @@ public class IndividualController extends AbstractController<Individual> impleme
            individualSearchRequest.setIncludeVoided(false);
            return repo.findAll(
                    where(repo.getFilterSpecForVoid(individualSearchRequest))
+                           .or(repo.getFilterSpecForRegistrationDateRange(individualSearchRequest))
+                           .or(repo.getFilterSpecForGender(individualSearchRequest))
+                           .or(repo.getFilterSpecForLocationIds(individualSearchRequest))
+                           .or(repo.getFilterSpecForAgeRange(individualSearchRequest))
+                           //  .or(repo.getFilterSpecForProgramEnrolmentDateRange(individualSearchRequest))
+                           .or(repo.getFilterSpecForIndividualType(individualSearchRequest))
+                           .or(repo.getFilterSpecForProgramEncounterDateRange(individualSearchRequest))
+                           //.or(repo.getFilterSpecForEncounterDateRange(individualSearchRequest))
+                           .or(repo.getFilterSpecForName(individualSearchRequest))
                    , pageable)
                    .map(t -> projectionFactory.createProjection(IndividualWebProjection.class, t));
 
@@ -192,7 +201,7 @@ public class IndividualController extends AbstractController<Individual> impleme
                         .and(repo.getFilterSpecForAgeRange(individualSearchRequest))
                       //  .and(repo.getFilterSpecForProgramEnrolmentDateRange(individualSearchRequest))
                         .and(repo.getFilterSpecForIndividualType(individualSearchRequest))
-                        //.and(repo.getFilterSpecForProgramEncounterDateRange(individualSearchRequest))
+                        .and(repo.getFilterSpecForProgramEncounterDateRange(individualSearchRequest))
                         //.and(repo.getFilterSpecForEncounterDateRange(individualSearchRequest))
                         .and(repo.getFilterSpecForName(individualSearchRequest))
                  , pageable)

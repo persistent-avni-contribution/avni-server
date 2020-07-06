@@ -1,7 +1,8 @@
 package org.openchs.web.request.search;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.joda.time.LocalDate;
-
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class MinMax {
 
     private LocalDate minValue;

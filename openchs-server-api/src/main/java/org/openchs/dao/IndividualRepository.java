@@ -163,47 +163,88 @@ public interface IndividualRepository extends TransactionalDataRepository<Indivi
     }
 
     default Specification<Individual> getFilterSpecForAgeRange(IndividualSearchRequest  individualSearchRequest) {
-        return (Root<Individual> root, CriteriaQuery<?> query, CriteriaBuilder cb) ->
-                individualSearchRequest.getAge()==null  ? null :cb.and(cb.greaterThanOrEqualTo(root.get("individualAge"),individualSearchRequest.getAge().getMinValueInt())
-                ,cb.lessThanOrEqualTo(root.get("individualAge"),individualSearchRequest.getAge().getMaxValueInt())
-                );
+        return (Root<Individual> root, CriteriaQuery<?> query, CriteriaBuilder cb) -> {
+            if (null != individualSearchRequest.getAge()) {
+                if (null != individualSearchRequest.getAge().getMaxValueInt() && null != individualSearchRequest.getAge().getMinValueInt()) {
+                    return cb.and(cb.greaterThanOrEqualTo(root.get("individualAge"), individualSearchRequest.getAge().getMinValueInt())
+                            , cb.lessThanOrEqualTo(root.get("individualAge"), individualSearchRequest.getAge().getMaxValueInt()));
+                } else if (null != individualSearchRequest.getAge().getMinValueInt())
+                    return cb.greaterThanOrEqualTo(root.get("individualAge"), individualSearchRequest.getAge().getMinValueInt());
+            }
+            return null;
+        };
     }
 
     default Specification<Individual> getFilterSpecForRegistrationDateRange(IndividualSearchRequest  individualSearchRequest) {
         return (Root<Individual> root, CriteriaQuery<?> query, CriteriaBuilder cb) ->
-                ( individualSearchRequest.getRegistrationDate() == null && null==individualSearchRequest.getRegistrationDate().getMaxValue() && null==individualSearchRequest.getRegistrationDate().getMinValue() ) ? null : cb.and(
-                        cb.greaterThanOrEqualTo(root.get("registrationDate"),individualSearchRequest.getRegistrationDate().getMinValue())
-                        ,cb.lessThanOrEqualTo(root.get("registrationDate"),individualSearchRequest.getRegistrationDate().getMaxValue())
-                );
+        {
+
+                if(null!=individualSearchRequest.getRegistrationDate()) {
+                    if (individualSearchRequest.getRegistrationDate().getMinValue() != null && individualSearchRequest.getRegistrationDate().getMaxValue() != null)
+                        return cb.and(
+                                cb.greaterThanOrEqualTo(root.get("registrationDate"), individualSearchRequest.getRegistrationDate().getMinValue())
+                                , cb.lessThanOrEqualTo(root.get("registrationDate"), individualSearchRequest.getRegistrationDate().getMaxValue())
+                        );
+                    else if (individualSearchRequest.getRegistrationDate().getMinValue() != null)
+
+                        return cb.greaterThanOrEqualTo(root.get("registrationDate"), individualSearchRequest.getRegistrationDate().getMinValue());
+
+                }
+            return null ;
+        };
     }
 
     default Specification<Individual> getFilterSpecForProgramEnrolmentDateRange(IndividualSearchRequest  individualSearchRequest) {
-        return (Root<Individual> root, CriteriaQuery<?> query, CriteriaBuilder cb) ->
-                ( individualSearchRequest.getEnrolmentDate() == null && null==individualSearchRequest.getEnrolmentDate().getMaxValue() && null==individualSearchRequest.getEnrolmentDate().getMinValue() )? null :
-                    cb.and(cb.greaterThanOrEqualTo(root.join("programEnrolments", JoinType.LEFT).get("enrolmentDateTime").as(Date.class),
-                                     individualSearchRequest.getEnrolmentDate().getMinValue().toDate())
+        return (Root<Individual> root, CriteriaQuery<?> query, CriteriaBuilder cb) -> {
+            if(null!=individualSearchRequest.getEnrolmentDate()) {
+                if( null != individualSearchRequest.getEnrolmentDate().getMaxValue() && null != individualSearchRequest.getEnrolmentDate().getMinValue()) {
+                    return cb.and(cb.greaterThanOrEqualTo(root.join("programEnrolments", JoinType.LEFT).get("enrolmentDateTime").as(Date.class),
+                            individualSearchRequest.getEnrolmentDate().getMinValue().toDate())
                             , cb.lessThanOrEqualTo(root.join("programEnrolments", JoinType.LEFT).get("enrolmentDateTime").as(Date.class),
-                                    individualSearchRequest.getEnrolmentDate().getMaxValue().toDate())
-                    );
+                                    individualSearchRequest.getEnrolmentDate().getMaxValue().toDate()));
+                }
+                else if(null != individualSearchRequest.getEnrolmentDate().getMinValue())
+                    return cb.greaterThanOrEqualTo(root.join("programEnrolments", JoinType.LEFT).get("enrolmentDateTime").as(Date.class),
+                            individualSearchRequest.getEnrolmentDate().getMinValue().toDate());
+            }
+            return null;
+        };
     }
 
     default Specification<Individual> getFilterSpecForProgramEncounterDateRange(IndividualSearchRequest  individualSearchRequest) {
-        return (Root<Individual> root, CriteriaQuery<?> query, CriteriaBuilder cb) ->
-                ( individualSearchRequest.getProgramEncounterDate() == null && null==individualSearchRequest.getProgramEncounterDate().getMaxValue() && null==individualSearchRequest.getProgramEncounterDate().getMinValue() ) ? null :
-                        cb.and(cb.greaterThanOrEqualTo(root.join("programEnrolments", JoinType.LEFT).join("programEncounters", JoinType.LEFT).get("encounterDateTime").as(Date.class),
-                                individualSearchRequest.getProgramEncounterDate().getMinValue().toDate())
-                                , cb.lessThanOrEqualTo(root.join("programEnrolments", JoinType.LEFT).join("programEncounters", JoinType.LEFT).get("encounterDateTime").as(Date.class),
-                                        individualSearchRequest.getProgramEncounterDate().getMaxValue().toDate())
-                        );
-    }
+        return (Root<Individual> root, CriteriaQuery<?> query, CriteriaBuilder cb) -> {
+            if(null!=individualSearchRequest.getProgramEncounterDate()) {
+                if(null != individualSearchRequest.getProgramEncounterDate().getMaxValue() && null != individualSearchRequest.getProgramEncounterDate().getMinValue()) {
+                    return cb.and(
+                            cb.greaterThanOrEqualTo(root.join("programEnrolments", JoinType.LEFT).join("programEncounters", JoinType.LEFT).get("encounterDateTime").as(Date.class),
+                                    individualSearchRequest.getProgramEncounterDate().getMinValue().toDate())
+                            , cb.lessThanOrEqualTo(root.join("programEnrolments", JoinType.LEFT).join("programEncounters", JoinType.LEFT).get("encounterDateTime").as(Date.class),
+                                    individualSearchRequest.getProgramEncounterDate().getMaxValue().toDate()));
+                }
+                        else if(null != individualSearchRequest.getProgramEncounterDate().getMinValue())
+                        return cb.greaterThanOrEqualTo(root.join("programEnrolments", JoinType.LEFT).join("programEncounters", JoinType.LEFT).get("encounterDateTime").as(Date.class),
+                                individualSearchRequest.getProgramEncounterDate().getMinValue().toDate());
+                }
+                return null;
+            };
+        }
+
     default Specification<Individual> getFilterSpecForEncounterDateRange(IndividualSearchRequest  individualSearchRequest) {
-        return (Root<Individual> root, CriteriaQuery<?> query, CriteriaBuilder cb) ->
-                ( individualSearchRequest.getEncounterDate() == null && null==individualSearchRequest.getEncounterDate().getMaxValue() && null==individualSearchRequest.getEncounterDate().getMinValue() )? null :
-                        cb.and(cb.greaterThanOrEqualTo(root.join("encounters", JoinType.LEFT).get("encounterDateTime").as(Date.class),
-                                individualSearchRequest.getEncounterDate().getMinValue().toDate())
-                                , cb.lessThanOrEqualTo(root.join("encounters", JoinType.LEFT).get("encounterDateTime").as(Date.class),
-                                        individualSearchRequest.getEncounterDate().getMaxValue().toDate())
-                        );
+        return (Root<Individual> root, CriteriaQuery<?> query, CriteriaBuilder cb) -> {
+            if(null!= individualSearchRequest.getEncounterDate()) {
+                if (null != individualSearchRequest.getEncounterDate().getMaxValue() && null != individualSearchRequest.getEncounterDate().getMinValue()) {
+                    return cb.and(
+                            cb.greaterThanOrEqualTo(root.join("encounters", JoinType.LEFT).get("encounterDateTime").as(Date.class),
+                                    individualSearchRequest.getEncounterDate().getMinValue().toDate())
+                            , cb.lessThanOrEqualTo(root.join("encounters", JoinType.LEFT).get("encounterDateTime").as(Date.class),
+                                    individualSearchRequest.getEncounterDate().getMaxValue().toDate()));
+                }
+                else if (null != individualSearchRequest.getEncounterDate().getMinValue())
+                    cb.greaterThanOrEqualTo(root.join("encounters", JoinType.LEFT).get("encounterDateTime").as(Date.class),
+                            individualSearchRequest.getEncounterDate().getMinValue().toDate());
+            }
+            return null;
+        };
     }
 
     @Override
