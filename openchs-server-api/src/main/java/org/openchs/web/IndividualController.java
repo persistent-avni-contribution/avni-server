@@ -186,14 +186,15 @@ public class IndividualController extends AbstractController<Individual> impleme
        }
         return repo.findAll(
                 where(repo.getFilterSpecForVoid(individualSearchRequest))
-                       //.or(repo.getFilterSpecForIndividualType(query))
-                        //.and(repo.getFilterSpecForGender(individualSearchRequest))
-                        //.or(repo.getFilterSpecForAddress(query))
-                        //.or(repo.getFilterSpecForAgeRange(query))
-                        //.and(repo.getFilterSpecForEnrolmentDateRange(individualSearchRequest))
-                        .and(repo.getFilterSpecForObs("10"))
-                        //.and(repo.getFilterSpecForProgramEncounterDateRange(individualSearchRequest))
-                        //.and(repo.getFilterSpecForName(individualSearchRequest))
+                       .and(repo.getFilterSpecForRegistrationDateRange(individualSearchRequest))
+                        .and(repo.getFilterSpecForGender(individualSearchRequest))
+                        .and(repo.getFilterSpecForLocationIds(individualSearchRequest))
+                        .and(repo.getFilterSpecForAgeRange(individualSearchRequest))
+                        .and(repo.getFilterSpecForProgramEnrolmentDateRange(individualSearchRequest))
+                        .and(repo.getFilterSpecForIndividualType(individualSearchRequest))
+                        .and(repo.getFilterSpecForProgramEncounterDateRange(individualSearchRequest))
+                        .and(repo.getFilterSpecForEncounterDateRange(individualSearchRequest))
+                        .and(repo.getFilterSpecForName(individualSearchRequest))
                  , pageable)
                 .map(t -> projectionFactory.createProjection(IndividualWebProjection.class, t));
     }

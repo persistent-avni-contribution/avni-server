@@ -14,7 +14,7 @@ public class IndividualSearchRequest {
 
     private String subjectType;
 
-    private String address;
+    private List<Long>  addressIds;
 
     private MinMax registrationDate;
 
@@ -27,6 +27,7 @@ public class IndividualSearchRequest {
     private MinMax programEncounterDate;
 
     private MinMax enrolmentDate;
+
 
     public String getName() {
         return name;
@@ -68,12 +69,12 @@ public class IndividualSearchRequest {
         this.subjectType = subjectType;
     }
 
-    public String getAddress() {
-        return address;
+    public List<Long> getAddressIds() {
+        return addressIds;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
+    public void setAddressIds(List<Long> addressIds) {
+        this.addressIds = addressIds;
     }
 
     public MinMax getRegistrationDate() {
@@ -132,7 +133,7 @@ public class IndividualSearchRequest {
                 ", includeVoided=" + includeVoided +
                 ", gender='" + gender + '\'' +
                 ", subjectType='" + subjectType + '\'' +
-                ", address='" + address + '\'' +
+                ", address='" + addressIds + '\'' +
                 ", registrationDate=" + registrationDate +
                 ", concept=" + concept +
                 ", searchAll='" + searchAll + '\'' +

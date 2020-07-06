@@ -114,7 +114,7 @@ public interface IndividualRepository extends TransactionalDataRepository<Indivi
     default Specification<Individual> getFilterSpecForName(IndividualSearchRequest individualSearchRequest) {
         return (Root<Individual> root, CriteriaQuery<?> query, CriteriaBuilder cb) -> {
            String value  = individualSearchRequest.getName();
-            if (value != null){
+            if (value != null && "".equals(value.trim())){
                 Predicate[] predicates = new Predicate[2];
                 String[] values = value.trim().split(" ");
                 if (values.length > 0) {
@@ -126,7 +126,7 @@ public interface IndividualRepository extends TransactionalDataRepository<Indivi
                 }
                 return cb.or(predicates[0], predicates[1]);
             }
-            return cb.and();
+            return null;
         };
     }
 
@@ -140,20 +140,20 @@ public interface IndividualRepository extends TransactionalDataRepository<Indivi
 
     }
 
-    default Specification<Individual> getFilterSpecForIndividualType(String value) {
+    default Specification<Individual> getFilterSpecForIndividualType(IndividualSearchRequest individualSearchRequest) {
 
         return (Root<Individual> root, CriteriaQuery<?> query, CriteriaBuilder cb) ->
-                value == null ? cb.and() : root.get("subjectType").get("uuid").in(value);
+                individualSearchRequest.getSubjectType() == null ? null : root.get("subjectType").get("uuid").in(individualSearchRequest.getSubjectType());
     }
 
     default Specification<Individual> getFilterSpecForGender(IndividualSearchRequest individualSearchRequest) {
         return (Root<Individual> root, CriteriaQuery<?> query, CriteriaBuilder cb) ->
-                individualSearchRequest.getGender() == null ?cb.and() : cb.or(root.get("gender").get("uuid").in(individualSearchRequest.getGender()));
+                individualSearchRequest.getGender() == null ? null : root.get("gender").get("uuid").in(individualSearchRequest.getGender());
     }
 
-    default Specification<Individual> getFilterSpecForLocationIds(List<Long> locationIds) {
+    default Specification<Individual> getFilterSpecForLocationIds(IndividualSearchRequest individualSearchRequest) {
         return (Root<Individual> root, CriteriaQuery<?> query, CriteriaBuilder cb) ->
-                locationIds == null ? cb.and() : root.get("addressLevel").get("id").in(locationIds);
+                individualSearchRequest.getAddressIds() == null ? null : root.get("addressLevel").get("id").in(individualSearchRequest.getAddressIds());
     }
 
     default Specification<Individual> getFilterSpecForAddress(String locationName) {
@@ -164,46 +164,46 @@ public interface IndividualRepository extends TransactionalDataRepository<Indivi
 
     default Specification<Individual> getFilterSpecForAgeRange(IndividualSearchRequest  individualSearchRequest) {
         return (Root<Individual> root, CriteriaQuery<?> query, CriteriaBuilder cb) ->
-                (individualSearchRequest == null && individualSearchRequest.getAge()==null ) ? cb.and() :cb.or(cb.and(cb.greaterThanOrEqualTo(root.get("individualAge"),individualSearchRequest.getAge().getMinValueInt())
+                individualSearchRequest.getAge()==null  ? null :cb.and(cb.greaterThanOrEqualTo(root.get("individualAge"),individualSearchRequest.getAge().getMinValueInt())
                 ,cb.lessThanOrEqualTo(root.get("individualAge"),individualSearchRequest.getAge().getMaxValueInt())
-                ));
+                );
     }
 
     default Specification<Individual> getFilterSpecForRegistrationDateRange(IndividualSearchRequest  individualSearchRequest) {
         return (Root<Individual> root, CriteriaQuery<?> query, CriteriaBuilder cb) ->
-                (individualSearchRequest == null && individualSearchRequest.getRegistrationDate()==null ) ? cb.and() :cb.or(cb.and(
+                ( individualSearchRequest.getEnrolmentDate() == null && null==individualSearchRequest.getEnrolmentDate().getMaxValue() && null==individualSearchRequest.getEnrolmentDate().getMinValue() ) ? null : cb.and(
                         cb.greaterThanOrEqualTo(root.get("registrationDate"),individualSearchRequest.getRegistrationDate().getMinValue())
                         ,cb.lessThanOrEqualTo(root.get("registrationDate"),individualSearchRequest.getRegistrationDate().getMaxValue())
-                ));
+                );
     }
 
     default Specification<Individual> getFilterSpecForProgramEnrolmentDateRange(IndividualSearchRequest  individualSearchRequest) {
         return (Root<Individual> root, CriteriaQuery<?> query, CriteriaBuilder cb) ->
-                (individualSearchRequest == null && individualSearchRequest.getEnrolmentDate() == null) ? cb.and() : cb.or(
+                ( individualSearchRequest.getEnrolmentDate() == null && null==individualSearchRequest.getEnrolmentDate().getMaxValue() && null==individualSearchRequest.getEnrolmentDate().getMinValue() )? null :
                     cb.and(cb.greaterThanOrEqualTo(root.join("programEnrolments", JoinType.LEFT).get("enrolmentDateTime").as(Date.class),
                                      individualSearchRequest.getEnrolmentDate().getMinValue().toDate())
                             , cb.lessThanOrEqualTo(root.join("programEnrolments", JoinType.LEFT).get("enrolmentDateTime").as(Date.class),
                                     individualSearchRequest.getEnrolmentDate().getMaxValue().toDate())
-                    ));
+                    );
     }
 
     default Specification<Individual> getFilterSpecForProgramEncounterDateRange(IndividualSearchRequest  individualSearchRequest) {
         return (Root<Individual> root, CriteriaQuery<?> query, CriteriaBuilder cb) ->
-                (individualSearchRequest == null && individualSearchRequest.getEnrolmentDate() == null) ? cb.and() : cb.or(
+                ( individualSearchRequest.getEnrolmentDate() == null && null==individualSearchRequest.getEnrolmentDate().getMaxValue() && null==individualSearchRequest.getEnrolmentDate().getMinValue() ) ? null :
                         cb.and(cb.greaterThanOrEqualTo(root.join("programEnrolments", JoinType.LEFT).join("programEncounters", JoinType.LEFT).get("encounterDateTime").as(Date.class),
                                 individualSearchRequest.getEnrolmentDate().getMinValue().toDate())
                                 , cb.lessThanOrEqualTo(root.join("programEnrolments", JoinType.LEFT).join("programEncounters", JoinType.LEFT).get("encounterDateTime").as(Date.class),
                                         individualSearchRequest.getEnrolmentDate().getMaxValue().toDate())
-                        ));
+                        );
     }
     default Specification<Individual> getFilterSpecForEncounterDateRange(IndividualSearchRequest  individualSearchRequest) {
         return (Root<Individual> root, CriteriaQuery<?> query, CriteriaBuilder cb) ->
-                (individualSearchRequest == null && individualSearchRequest.getEnrolmentDate() == null) ? cb.and() : cb.or(
+                ( individualSearchRequest.getEnrolmentDate() == null && null==individualSearchRequest.getEnrolmentDate().getMaxValue() && null==individualSearchRequest.getEnrolmentDate().getMinValue() )? null :
                         cb.and(cb.greaterThanOrEqualTo(root.join("encounters", JoinType.LEFT).get("encounterDateTime").as(Date.class),
                                 individualSearchRequest.getEnrolmentDate().getMinValue().toDate())
                                 , cb.lessThanOrEqualTo(root.join("encounters", JoinType.LEFT).get("encounterDateTime").as(Date.class),
                                         individualSearchRequest.getEnrolmentDate().getMaxValue().toDate())
-                        ));
+                        );
     }
 
     @Override
