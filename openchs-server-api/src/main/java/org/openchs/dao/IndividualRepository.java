@@ -141,10 +141,14 @@ public interface IndividualRepository extends TransactionalDataRepository<Indivi
                 List<Concepts> conceptList=individualSearchRequest.getConcept();
                 List<Predicate> individualPredicates = new ArrayList<>();
                     for(Concepts concept:conceptList) {
-                        if("CODED".equalsIgnoreCase(concept.getDataType()))
+                        if("CODED".equalsIgnoreCase(concept.getDataType()) && "INDIVIDUAL".equalsIgnoreCase(concept.getSearchScope()))
                             individualPredicates.add(findInObservationSingleCoded(root.get("uuid"), concept.getUuid(), concept.getValue(), "INDIVIDUAL", "CODED", cb));
-                        else if("MULTICODED".equalsIgnoreCase(concept.getDataType()))
+                        else if("MULTICODED".equalsIgnoreCase(concept.getDataType()) && "INDIVIDUAL".equalsIgnoreCase(concept.getSearchScope()))
                             individualPredicates.add(findInObservationMultiCoded(root.get("uuid"), concept.getUuid(), concept.getValues(), "INDIVIDUAL", cb));
+                         else if("CODED".equalsIgnoreCase(concept.getDataType()) && "PROGRAMENROLMENT".equalsIgnoreCase(concept.getSearchScope())) {
+                            individualPredicates.add(findInObservationSingleCoded(root.join("programEnrolments", JoinType.LEFT).get("uuid"), concept.getUuid(), concept.getValue(), "PROGRAMEENROLMENT", "CODED", cb));
+                        System.out.println("programEnrolments :-"+root.join("programEnrolments", JoinType.LEFT).get("uuid"));
+                         }
                     }
                  //jsonContains(root.get("observations"), value , cb),
                 //jsonContains(root.join("programEnrolments", JoinType.LEFT).get("observations"),  value , cb),
