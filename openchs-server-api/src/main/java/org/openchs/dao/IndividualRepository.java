@@ -6,6 +6,7 @@ import org.hibernate.criterion.Restrictions;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.openchs.domain.*;
+import org.openchs.web.request.search.Concepts;
 import org.openchs.web.request.search.IndividualSearchRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,6 +26,7 @@ import java.sql.Date;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -130,14 +132,27 @@ public interface IndividualRepository extends TransactionalDataRepository<Indivi
         };
     }
 
-    default Specification<Individual> getFilterSpecForObs(String uuid) {
+    default Specification<Individual> getFilterSpecForObs(IndividualSearchRequest individualSearchRequest) {
         return (Root<Individual> root, CriteriaQuery<?> query, CriteriaBuilder cb) ->
-                uuid == null ? cb.and() : cb.or(
-                        observationsdata(root.get("uuid"),"2","abc","abc", "CODED", cb));
-        //jsonContains(root.get("observations"), value , cb),
-        //jsonContains(root.join("programEnrolments", JoinType.LEFT).get("observations"),  value , cb),
-        //jsonContains(root.join("encounters", JoinType.LEFT).get("observations"),  value , cb));
+        {
+            if (null == individualSearchRequest && null == individualSearchRequest.getConcept())
+                return null;
+            else {
+                List<Concepts> conceptList=individualSearchRequest.getConcept();
+                List<Predicate> individualPredicates = new ArrayList<>();
+                    for(Concepts concept:conceptList) {
+                        if("CODED".equalsIgnoreCase(concept.getDataType()))
+                            individualPredicates.add(findInObservationSingleCoded(root.get("uuid"), concept.getUuid(), concept.getValue(), "INDIVIDUAL", "CODED", cb));
+                        else if("MULTICODED".equalsIgnoreCase(concept.getDataType()))
+                            individualPredicates.add(findInObservationMultiCoded(root.get("uuid"), concept.getUuid(), concept.getValues(), "INDIVIDUAL", cb));
+                    }
+                 //jsonContains(root.get("observations"), value , cb),
+                //jsonContains(root.join("programEnrolments", JoinType.LEFT).get("observations"),  value , cb),
+                // jsonContains(root.join("encounters", JoinType.LEFT).get("observations"),  value , cb));
+                return cb.or( individualPredicates.toArray(new Predicate[0]));
+            }
 
+        };
     }
 
     default Specification<Individual> getFilterSpecForIndividualType(IndividualSearchRequest individualSearchRequest) {
