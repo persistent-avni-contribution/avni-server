@@ -116,7 +116,25 @@ public interface IndividualRepository extends TransactionalDataRepository<Indivi
     default Specification<Individual> getFilterSpecForName(IndividualSearchRequest individualSearchRequest) {
         return (Root<Individual> root, CriteriaQuery<?> query, CriteriaBuilder cb) -> {
            String value  = individualSearchRequest.getName();
-            if (value != null && "".equals(value.trim())){
+            if (value != null && !"".equals(value.trim())){
+                Predicate[] predicates = new Predicate[2];
+                String[] values = value.trim().split(" ");
+                if (values.length > 0) {
+                    predicates[0] = cb.like(cb.upper(root.get("firstName")),  values[0].toUpperCase() + "%");
+                    predicates[1] = cb.like(cb.upper(root.get("lastName")),  values[0].toUpperCase() + "%");
+                }
+                if (values.length > 1) {
+                    predicates[1] = cb.like(cb.upper(root.get("lastName")),  values[1].toUpperCase() + "%");
+                }
+                return cb.or(predicates[0], predicates[1]);
+            }
+            return null;
+        };
+    }
+    default Specification<Individual> getFilterSpecForNameOld(String individualSearchRequest) {
+        return (Root<Individual> root, CriteriaQuery<?> query, CriteriaBuilder cb) -> {
+            String value  = individualSearchRequest;
+            if (value != null && !"".equals(value.trim())){
                 Predicate[] predicates = new Predicate[2];
                 String[] values = value.trim().split(" ");
                 if (values.length > 0) {
@@ -132,6 +150,7 @@ public interface IndividualRepository extends TransactionalDataRepository<Indivi
         };
     }
 
+
     default Specification<Individual> getFilterSpecForObs(IndividualSearchRequest individualSearchRequest) {
         return (Root<Individual> root, CriteriaQuery<?> query, CriteriaBuilder cb) ->
         {
@@ -143,11 +162,11 @@ public interface IndividualRepository extends TransactionalDataRepository<Indivi
                     for(Concepts concept:conceptList) {
                         if("CODED".equalsIgnoreCase(concept.getDataType()) && "INDIVIDUAL".equalsIgnoreCase(concept.getSearchScope()))
                             individualPredicates.add(findInObservationSingleCoded(root.get("uuid"), concept.getUuid(), concept.getValue(), "INDIVIDUAL", "CODED", cb));
-                        else if("MULTICODED".equalsIgnoreCase(concept.getDataType()) && "INDIVIDUAL".equalsIgnoreCase(concept.getSearchScope()))
+                         if("MULTICODED".equalsIgnoreCase(concept.getDataType()) && "INDIVIDUAL".equalsIgnoreCase(concept.getSearchScope()))
                             individualPredicates.add(findInObservationMultiCoded(root.get("uuid"), concept.getUuid(), concept.getValues(), "INDIVIDUAL", cb));
                          else if("CODED".equalsIgnoreCase(concept.getDataType()) && "PROGRAMENROLMENT".equalsIgnoreCase(concept.getSearchScope())) {
-                            individualPredicates.add(findInObservationSingleCoded(root.join("programEnrolments", JoinType.LEFT).get("uuid"), concept.getUuid(), concept.getValue(), "PROGRAMEENROLMENT", "CODED", cb));
-                        System.out.println("programEnrolments :-"+root.join("programEnrolments", JoinType.LEFT).get("uuid"));
+                            individualPredicates.add(findInObservationSingleCoded(root.join("programEnrolments", JoinType.INNER).get("uuid"), concept.getUuid(), concept.getValue(), "PROGRAMEENROLMENT", "CODED", cb));
+
                          }
                     }
                  //jsonContains(root.get("observations"), value , cb),

@@ -129,7 +129,7 @@ public class IndividualController extends AbstractController<Individual> impleme
         }
     }
 
- /*   @GetMapping(value = "/individual/search")
+    @GetMapping(value = "/individual/search")
     @PreAuthorize(value = "hasAnyAuthority('user', 'organisation_admin')")
     @ResponseBody
     public Page<IndividualWebProjection> search(
@@ -156,10 +156,10 @@ public class IndividualController extends AbstractController<Individual> impleme
 //                , pageable)
 //                .map(t -> projectionFactory.createProjection(IndividualWebProjection.class, t));
         return repo.findAll(
-                where(repo.getFilterSpecForName(individualSearchRequest))
+                where(repo.getFilterSpecForNameOld(query))
                 , pageable)
                 .map(t -> projectionFactory.createProjection(IndividualWebProjection.class, t));
-    }*/
+    }
 
     @PostMapping(value = "/individual/search/v2")
     @PreAuthorize(value = "hasAnyAuthority('user', 'organisation_admin')")
@@ -203,8 +203,8 @@ public class IndividualController extends AbstractController<Individual> impleme
                         .and(repo.getFilterSpecForIndividualType(individualSearchRequest))
                         //.and(repo.getFilterSpecForProgramEncounterDateRange(individualSearchRequest))
                         //.and(repo.getFilterSpecForEncounterDateRange(individualSearchRequest))
-                        //.and(repo.getFilterSpecForName(individualSearchRequest))
-                        .and(repo.getFilterSpecForObs(individualSearchRequest))
+                        .and(repo.getFilterSpecForName(individualSearchRequest))
+                       // .and(repo.getFilterSpecForObs(individualSearchRequest))
                  , pageable)
                 .map(t -> projectionFactory.createProjection(IndividualWebProjection.class, t));
     }
