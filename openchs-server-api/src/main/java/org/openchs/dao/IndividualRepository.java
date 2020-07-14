@@ -143,4 +143,8 @@ public interface IndividualRepository extends TransactionalDataRepository<Indivi
     Page<Individual> findIndividuals(String subjectTypeUUID, Pageable pageable);
 
     Individual findByLegacyId(String legacyId);
+
+
+    @Query(value = "SELECT * FROM search_function_1 (:jsonSearch)", nativeQuery = true)
+    List<Individual> findIndividual(String jsonSearch);
 }

@@ -2,10 +2,7 @@ package org.openchs.web;
 
 import org.joda.time.DateTime;
 import org.openchs.dao.*;
-import org.openchs.domain.AddressLevel;
-import org.openchs.domain.Gender;
-import org.openchs.domain.Individual;
-import org.openchs.domain.SubjectType;
+import org.openchs.domain.*;
 import org.openchs.geo.Point;
 import org.openchs.projection.IndividualWebProjection;
 import org.openchs.service.*;
@@ -26,6 +23,7 @@ import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
@@ -153,6 +151,16 @@ public class IndividualController extends AbstractController<Individual> impleme
                 , pageable)
                 .map(t -> projectionFactory.createProjection(IndividualWebProjection.class, t));
     }
+
+    @PostMapping(value= "/web/searchAPI/v2")
+    @PreAuthorize(value = "hasAnyAuthority('user', 'organisation_admin')")
+    @ResponseBody
+    public Page<List<IndividualSearchV2>> getSearch(@RequestBody String searchQuery) {
+        IndividualRepository repo = this.individualRepository;
+        repo.findIndividual(searchQuery);
+        return null;
+    }
+
 
     @GetMapping(value = "/web/individual/{uuid}")
     @PreAuthorize(value = "hasAnyAuthority('user', 'organisation_admin')")

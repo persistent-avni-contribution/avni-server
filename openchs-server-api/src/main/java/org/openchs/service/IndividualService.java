@@ -1,5 +1,6 @@
 package org.openchs.service;
 
+import org.hibernate.procedure.ProcedureOutputs;
 import org.joda.time.DateTime;
 import org.openchs.dao.ConceptRepository;
 import org.openchs.dao.EncounterRepository;
@@ -16,6 +17,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.projection.ProjectionFactory;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.ParameterMode;
+import javax.persistence.StoredProcedureQuery;
 import javax.validation.constraints.NotNull;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -32,15 +37,17 @@ public class IndividualService {
     private final ProjectionFactory projectionFactory;
     private final EncounterRepository encounterRepository;
     private final ObservationService observationService;
+    private final EntityManager entityManager;
 
     @Autowired
-    public IndividualService(ConceptRepository conceptRepository, IndividualRepository individualRepository, ProjectionFactory projectionFactory,EncounterRepository encounterRepository,ObservationService observationService) {
+    public IndividualService(ConceptRepository conceptRepository, IndividualRepository individualRepository, ProjectionFactory projectionFactory, EncounterRepository encounterRepository, ObservationService observationService, EntityManagerFactory entityManagerFactory) {
         this.projectionFactory = projectionFactory;
         logger = LoggerFactory.getLogger(this.getClass());
         this.conceptRepository = conceptRepository;
         this.individualRepository = individualRepository;
         this.encounterRepository = encounterRepository;
         this.observationService = observationService;
+        this.entityManager = entityManagerFactory.createEntityManager();
     }
 
     public  IndividualContract getSubjectEncounters(String individualUuid){
@@ -220,4 +227,15 @@ public class IndividualService {
         }
         return relationshipContract;
     }
+
+   /* public List<Individual> getsearch(String jsonRequest) {
+        StoredProcedureQuery procedureQuery =
+                entityManager.createStoredProcedureQuery("SEARCH_FUNCTION_1", IndividualSearchV2.class);
+        procedureQuery.registerStoredProcedureParameter("REF_CURSOR_INDIVIDUAL", void.class, ParameterMode.REF_CURSOR);
+        procedureQuery.registerStoredProcedureParameter(jsonRequest, String.class, ParameterMode.IN);
+        procedureQuery.execute();
+        List<IndividualSearchV2> resultList = procedureQuery.getResultList();
+        return null;
+    }*/
+
 }
