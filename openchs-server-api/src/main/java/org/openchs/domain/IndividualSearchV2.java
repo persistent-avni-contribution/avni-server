@@ -1,15 +1,27 @@
 package org.openchs.domain;
 
-import org.hibernate.annotations.BatchSize;
-
-import javax.persistence.Entity;
-
-@Entity
-@BatchSize(size = 100)
 public class IndividualSearchV2 {
 
+    String firstName;
+    String lastName;
     String fullname;
     String lineage;
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
 
     public String getFullname() {
         return fullname;
@@ -30,6 +42,8 @@ public class IndividualSearchV2 {
     @Override
     public String toString() {
         return "IndividualSearchV2{" +
+                "firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
                 ", fullname='" + fullname + '\'' +
                 ", lineage='" + lineage + '\'' +
                 '}';

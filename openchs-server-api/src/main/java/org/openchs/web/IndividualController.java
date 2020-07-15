@@ -23,7 +23,6 @@ import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
@@ -155,12 +154,10 @@ public class IndividualController extends AbstractController<Individual> impleme
     @PostMapping(value= "/web/searchAPI/v2")
     @PreAuthorize(value = "hasAnyAuthority('user', 'organisation_admin')")
     @ResponseBody
-    public Page<List<IndividualSearchV2>> getSearch(@RequestBody String searchQuery) {
-        IndividualRepository repo = this.individualRepository;
-        repo.findIndividual(searchQuery);
+    public List<Individual> getSearch(@RequestBody String searchQuery) {
+        individualService.getsearch(searchQuery);
         return null;
     }
-
 
     @GetMapping(value = "/web/individual/{uuid}")
     @PreAuthorize(value = "hasAnyAuthority('user', 'organisation_admin')")

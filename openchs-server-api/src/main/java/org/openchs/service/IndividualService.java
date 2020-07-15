@@ -1,7 +1,5 @@
 package org.openchs.service;
 
-import org.hibernate.procedure.ProcedureOutputs;
-import org.joda.time.DateTime;
 import org.openchs.dao.ConceptRepository;
 import org.openchs.dao.EncounterRepository;
 import org.openchs.dao.IndividualRepository;
@@ -12,21 +10,12 @@ import org.openchs.web.request.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.projection.ProjectionFactory;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.ParameterMode;
-import javax.persistence.StoredProcedureQuery;
-import javax.validation.constraints.NotNull;
+import javax.persistence.*;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static java.util.Collections.singletonList;
-import static org.springframework.data.jpa.domain.Specifications.where;
 
 
 @Service
@@ -230,12 +219,28 @@ public class IndividualService {
 
    /* public List<Individual> getsearch(String jsonRequest) {
         StoredProcedureQuery procedureQuery =
-                entityManager.createStoredProcedureQuery("SEARCH_FUNCTION_1", IndividualSearchV2.class);
-        procedureQuery.registerStoredProcedureParameter("REF_CURSOR_INDIVIDUAL", void.class, ParameterMode.REF_CURSOR);
-        procedureQuery.registerStoredProcedureParameter(jsonRequest, String.class, ParameterMode.IN);
+                entityManager.createStoredProcedureQuery("func100", Individual.class);
+       // procedureQuery.registerStoredProcedureParameter("REF_CURSOR_INDIVIDUAL", void.class, ParameterMode.REF_CURSOR);
+        procedureQuery.registerStoredProcedureParameter("jsonRequest", String.class, ParameterMode.IN);
+        procedureQuery.setParameter("jsonRequest", jsonRequest);
         procedureQuery.execute();
-        List<IndividualSearchV2> resultList = procedureQuery.getResultList();
+        List<Object[]> obj = procedureQuery.getResultList();
+        for (Object[] a : obj) {
+            System.out.println("Individual " + a[0]+" "+a[1]);
+        }
         return null;
     }*/
+
+    public List<Individual> getsearch(String jsonSearch) {
+        Query q = entityManager.createNativeQuery("select firstname,lastname,id,uuid,title_lineage " +
+                "from search_function_2 (?1)");
+        q.setParameter(1, jsonSearch);
+        List<Object[]> obj = q.getResultList();
+
+        for (Object[] a : obj) {
+            System.out.println("Individual " + a[0]+" "+a[1]+" "+a[2]+" "+a[3]+" "+a[4]);
+        }
+        return null;
+    }
 
 }
