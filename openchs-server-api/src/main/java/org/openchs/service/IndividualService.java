@@ -26,17 +26,15 @@ public class IndividualService {
     private final ProjectionFactory projectionFactory;
     private final EncounterRepository encounterRepository;
     private final ObservationService observationService;
-    private final EntityManager entityManager;
 
     @Autowired
-    public IndividualService(ConceptRepository conceptRepository, IndividualRepository individualRepository, ProjectionFactory projectionFactory, EncounterRepository encounterRepository, ObservationService observationService, EntityManagerFactory entityManagerFactory) {
+    public IndividualService(ConceptRepository conceptRepository, IndividualRepository individualRepository, ProjectionFactory projectionFactory, EncounterRepository encounterRepository, ObservationService observationService) {
         this.projectionFactory = projectionFactory;
         logger = LoggerFactory.getLogger(this.getClass());
         this.conceptRepository = conceptRepository;
         this.individualRepository = individualRepository;
         this.encounterRepository = encounterRepository;
         this.observationService = observationService;
-        this.entityManager = entityManagerFactory.createEntityManager();
     }
 
     public  IndividualContract getSubjectEncounters(String individualUuid){
@@ -215,32 +213,6 @@ public class IndividualService {
             relationshipContract.setExitObservations(observationService.constructObservations(individualRelationship.getExitObservations()));
         }
         return relationshipContract;
-    }
-
-   /* public List<Individual> getsearch(String jsonRequest) {
-        StoredProcedureQuery procedureQuery =
-                entityManager.createStoredProcedureQuery("func100", Individual.class);
-       // procedureQuery.registerStoredProcedureParameter("REF_CURSOR_INDIVIDUAL", void.class, ParameterMode.REF_CURSOR);
-        procedureQuery.registerStoredProcedureParameter("jsonRequest", String.class, ParameterMode.IN);
-        procedureQuery.setParameter("jsonRequest", jsonRequest);
-        procedureQuery.execute();
-        List<Object[]> obj = procedureQuery.getResultList();
-        for (Object[] a : obj) {
-            System.out.println("Individual " + a[0]+" "+a[1]);
-        }
-        return null;
-    }*/
-
-    public List<Individual> getsearch(String jsonSearch) {
-        Query q = entityManager.createNativeQuery("select firstname,lastname,id,uuid,title_lineage " +
-                "from search_function_2 (?1)");
-        q.setParameter(1, jsonSearch);
-        List<Object[]> obj = q.getResultList();
-
-        for (Object[] a : obj) {
-            System.out.println("Individual " + a[0]+" "+a[1]+" "+a[2]+" "+a[3]+" "+a[4]);
-        }
-        return null;
     }
 
 }
